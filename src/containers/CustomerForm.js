@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import createCustomerService from '../services/createCustomerService';
 
 
-const CustomerForm = ({appState}) => {
+const CustomerForm = ({fbUser}) => {
     const [customer, setCustomer] = useState({});
 
     const handleNameChange = ({ target }) => {
@@ -17,7 +17,7 @@ const CustomerForm = ({appState}) => {
     }
 
     const handleCreateCustomer = async () => {
-        const fbuser = await createCustomerService(appState.idToken, customer);
+        const fbuser = await createCustomerService(fbUser, customer);
         console.log(fbuser);
         // setCustomer(fbuser);
     }

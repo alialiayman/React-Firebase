@@ -6,7 +6,7 @@ import signInService from '../../services/signIn';
 
 
 const SignIn = ({onSignIn}) => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({email: "ayali@hotmail.com", password: "paris123"});
 
     const handleEmailChange = ({ target }) => {
         setUser(u => u = { ...u, email: target.value });
@@ -18,7 +18,7 @@ const SignIn = ({onSignIn}) => {
 
     const handleSignIn = async () => {
         const fbuser = await signInService(user);
-        onSignIn(fbuser.data.idToken);
+        onSignIn(fbuser.data);
     }
 
     return (

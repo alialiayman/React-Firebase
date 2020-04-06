@@ -7,13 +7,13 @@ import CustomerForm from './containers/CustomerForm';
 function App() {
   const [appState, setAppState] = useState({});
   
-  const handleSignIn = (idToken)=> {
-    setAppState(s=> s = {...appState, idToken});
+  const handleSignIn = (fbUser)=> {
+    setAppState(s=> s = {...appState, User: fbUser});
   }
   return (
     <div className="App">
       {
-        appState.idToken ? <CustomerForm  appState={appState}/> : <SignIn onSignIn={handleSignIn} />
+        (appState.User) && (appState.User.idToken )? <CustomerForm  fbUser={appState.User}/> : <SignIn onSignIn={handleSignIn} />
       }
     </div>
   );
