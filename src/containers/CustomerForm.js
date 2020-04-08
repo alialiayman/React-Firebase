@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import styled from 'styled-components'
 import createCustomerService from '../services/createCustomerService';
+import { makeStyles } from '@material-ui/core/styles';
 
 
-const CustomerForm = ({fbUser}) => {
+const useStyles = makeStyles((theme) => ({
+    formContainer: {
+        display: 'flex',
+        height: '30vh',
+        flexDirection: 'column',
+        width: '40%',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        margin: '10px auto',
+    },
+}));
+
+const CustomerForm = ({ fbUser }) => {
     const [customer, setCustomer] = useState({});
-
+    const classes = useStyles();
     const handleNameChange = ({ target }) => {
         setCustomer(u => u = { ...u, name: target.value });
     }
@@ -24,27 +36,16 @@ const CustomerForm = ({fbUser}) => {
 
     return (
         <React.Fragment>
-            <Form>
+            <form className={classes.formContainer}>
                 <TextField value={customer.name} onChange={handleNameChange} label="Name" />
                 <TextField value={customer.address} onChange={handleAddressChange} label="Address" />
                 <Button variant="contained" color='primary' onClick={handleCreateCustomer}> Create Customer </Button>
-            </Form>
+            </form>
 
             {JSON.stringify(customer)}
         </React.Fragment>
     )
 }
 
-
-const Form = styled.div`
-display: flex;
-height: 30vh;
-flex-direction: column;
-width: 40%;
-justify-content: space-around;
-align-items: center;
-margin: 10px auto;
-
-`
 
 export default CustomerForm;
