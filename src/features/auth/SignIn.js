@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import {AlternateEmail, LockOutlined} from '@material-ui/icons';
 
+// TODO: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js
+// TODO: use formik https://www.youtube.com/watch?v=TxEVnaISj1w
 const useStyles = makeStyles((theme) => ({
     formContainer: {
         display: 'flex',
