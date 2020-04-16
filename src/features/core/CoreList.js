@@ -64,7 +64,7 @@ const CoreList = ({ schema }) => {
 
     return (
         <MaterialTable icons={tableIcons}
-            title={schema.name}
+            title={`${schema.name}s`}
             columns={state.columns}
             data={state.data}
             editable={{
