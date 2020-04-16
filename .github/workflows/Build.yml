@@ -21,9 +21,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
-    - run: git config --global user.email "aliayman@alumni.harvard.edu"
-    - run: git config --global user.name "alialiayman"
-    - run: git remote set-url "https://alialiayman:(Paris123))@github.com/alialiayman/React-Firebase.git"
     - run: npm run build
     - run: npm test
-    - run: npm run deploy
