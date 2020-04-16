@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-// import SignUp from './containers/auth/SignUp';
-import SignIn from './containers/auth/SignIn';
-import CustomerForm from './containers/CustomerForm';
+// import SignUp from './features/auth/SignUp';
+import SignIn from './features/auth/SignIn';
+import CustomerForm from './features/CustomerForm';
 
 function App() {
   const [appState, setAppState] = useState({});
