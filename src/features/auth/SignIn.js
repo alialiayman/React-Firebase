@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const SignIn = ({ onSignIn }) => {
+const SignIn = ({ onSignedIn }) => {
     const [user, setUser] = useState({ email: "ayali@hotmail.com", password: "paris123" });
     const classes = useStyles();
 
@@ -38,7 +38,7 @@ const SignIn = ({ onSignIn }) => {
 
     const handleSignIn = async () => {
         const fbuser = await authService.signIn(user);
-        onSignIn(fbuser.data);
+        onSignedIn(fbuser.data);
     }
 
     return (
