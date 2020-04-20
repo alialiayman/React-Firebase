@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
-import './App.css';
 // import SignUp from './features/auth/SignUp';
 import SignIn from './features/auth/SignIn';
 import CustomersManager from './features/Customers/CustomersManager';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import AppHeader from './features/AppHeader/AppHeader';
+import ContactsManager from './features/Contacts/ContactsManager';
 
 function App() {
   const [appState, setAppState] = useState({ User: {} });
-  const [mode, setMode] = useState(0);
-
   const handleOnSignedIn = (fbUser) => {
     if (fbUser) {
       setAppState(s => s = { ...appState, User: fbUser });
-      setMode(1);
     }
   }
 
 
   return (
-    <div className="App">
-      {
-        (mode === 0) ? <SignIn onSignedIn={handleOnSignedIn} /> : <CustomersManager fbUser={appState.User}/>
-      }
-    </div>
+    <Router>
+      <AppHeader fbUser={appState.User}></AppHeader>
+      <Route exact path="/" component={null}></Route>
+      <Route exact path="/signin" component={() => <SignIn onSignedIn={handleOnSignedIn} />}></Route>
+      <Route exact path="/customers" component={() => <CustomersManager fbUser={appState.User} />}></Route>
+      <Route exact path="/contacts" component={() => <ContactsManager fbUser={appState.User} />}></Route>
+    </Router>
   );
 }
 

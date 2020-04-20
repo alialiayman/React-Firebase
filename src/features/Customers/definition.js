@@ -1,4 +1,4 @@
-const customersDefinition = {
+const definition = {
     name: 'Customer',
     fields: [
       {name: 'id', label: 'Id', type: 'text', isKey: true, isSummary: false, summaryOrder: 0, editOrder: 0, defaultValue: ''},
@@ -7,4 +7,4 @@ const customersDefinition = {
     ]
   }
 
-  export default customersDefinition;
+  export default definition;

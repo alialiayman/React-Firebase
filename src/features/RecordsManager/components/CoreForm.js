@@ -38,7 +38,7 @@ const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, o
 
     const keyName = definition.fields.find(k=> k.isKey).name;
     const classes = useStyles();
-    const svc = firebaseService();
+    const svc = firebaseService(definition.name.toLowerCase());
     const title = (mode) => {
         switch (mode) {
             case 1:
@@ -58,14 +58,16 @@ const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, o
             <Formik
                 initialValues={inputRecord}
                 onSubmit={async (values, { setSubmitting }) => {
+                    const pureObject = {};
+                    sortedFields.forEach(f=> pureObject[f.name] = values[f.name]);
                     if (mode === 1) {
-                        const result = await svc.createRecord(fbUser, values);
+                        const result = await svc.createRecord(fbUser, pureObject);
                         onAdded({ ...values, id: result.data.name });
                     } else if (mode === 2) {
-                        await svc.deleteRecord(fbUser, inputRecord[keyName], values);
+                        await svc.deleteRecord(fbUser, inputRecord[keyName], pureObject);
                         onDeleted(values);
                     } else if (mode === 3) {
-                        await svc.updateRecord(fbUser, inputRecord[keyName], values);
+                        await svc.updateRecord(fbUser, inputRecord[keyName], pureObject);
                         onUpdated(values);
                     }
                     setSubmitting(false);

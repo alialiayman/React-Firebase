@@ -2,11 +2,11 @@ import React from 'react';
 import definition from './definition';
 import RecordsManager from '../RecordsManager/RecordsManager';
 
-const CustomersManager = ({fbUser}) => {
+const ContactsManager = ({fbUser}) => {
     return (
         <RecordsManager fbUser={fbUser} definition={definition} />
     )
 
 }
 
-export default CustomersManager;
+export default ContactsManager;

@@ -5,6 +5,7 @@ import authService from '../../services/authService';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import {AlternateEmail, LockOutlined} from '@material-ui/icons';
+import {useHistory} from 'react-router-dom';
 
 // TODO: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js
 // TODO: use formik https://www.youtube.com/watch?v=TxEVnaISj1w
@@ -27,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 const SignIn = ({ onSignedIn }) => {
     const [user, setUser] = useState({ email: "ayali@hotmail.com", password: "paris123" });
     const classes = useStyles();
+    const history = useHistory();
 
     const handleEmailChange = ({ target }) => {
         setUser(u => u = { ...u, email: target.value });
@@ -38,6 +40,7 @@ const SignIn = ({ onSignedIn }) => {
 
     const handleSignIn = async () => {
         const fbuser = await authService.signIn(user);
+        history.push('/customers');
         onSignedIn(fbuser.data);
     }
 
