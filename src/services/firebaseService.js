@@ -9,11 +9,11 @@ const firebaseService = () => {
         return fbCustomer;
     },
     updateRecord: async (user, customerId, customer)=> {
-        const fbCustomer = await axios.put(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}/${customerId}.json?auth=${user.idToken}`, {name: customer.name, address: customer.address});
+        const result = await axios.put(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}/${customerId}.json?auth=${user.idToken}`, {name: customer.name, address: customer.address});
         return {...customer, id: customerId};
     },
     deleteRecord: async (user, customerId, customer)=> {
-        const fbCustomer = await axios.delete(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}/${customerId}.json?auth=${user.idToken}`);
+        const result = await axios.delete(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}/${customerId}.json?auth=${user.idToken}`);
         return {...customer, id: customerId};
     },
     getRecord: async (user, customerId)=> {
@@ -21,8 +21,8 @@ const firebaseService = () => {
         return fbCustomer;
     },
     getRecords: async (user, limit)=> { // TODO: implement limit on number of records returned 
-        const fbCustomer = await axios.get(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}.json?auth=${user.idToken}`);
-        return fbCustomer;
+        const result = await axios.get(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}.json?auth=${user.idToken}`);
+        return result;
     }}
 }
 

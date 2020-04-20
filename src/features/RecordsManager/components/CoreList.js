@@ -16,6 +16,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import MaterialTable from 'material-table';
+import _ from 'lodash';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -38,31 +39,39 @@ const tableIcons = {
   };
 
 
-const CoreList = ({ name, columns, records, onAdd, onDelete, onUpdate }) => {
+const CoreList = ({ definition, records, onAdd, onDelete, onUpdate }) => {
+  const fieldNames = definition.fields.map(f=> f.name);
+  const summaryColumns = _.filter(definition.fields, {'isSummary': true});
+  const sortedColumns = _.orderBy(summaryColumns, ['summaryOrder', ['asc']]).map(r=> {return {title: r.label, field: r.name}});
+
     return (
         <MaterialTable icons={tableIcons}
-            title={`${name}s`}
-            columns={columns}
+            title={`${definition.name}s`}
+            columns={sortedColumns}
             data={records}
             actions={[
               {
                 icon: tableIcons.Add,
-                tooltip: 'Add ' + name,
+                tooltip: 'Add ' + definition.name,
                 isFreeAction: true,
                 onClick: (event) => onAdd()
               },
               {
                 icon: tableIcons.Edit,
-                tooltip: 'Edit',
+                tooltip: 'Edit ' + definition.name,
                 onClick: (event, rowData) => {
-                  onUpdate({id: rowData.id, name: rowData.name, address: rowData.address})
+                  const editRecord = {};
+                  fieldNames.forEach(k=> editRecord[k] = rowData[k]);
+                  onUpdate(editRecord);
                 }
               },
               {
                 icon: tableIcons.Delete,
-                tooltip: 'Delete',
+                tooltip: 'Delete ' + definition.name,
                 onClick: (event, rowData) => {
-                  onDelete({id: rowData.id, name: rowData.name, address: rowData.address})
+                  const deleteRecord = {};
+                  fieldNames.forEach(k=> deleteRecord[k] = rowData[k]);
+                  onDelete(deleteRecord);
                 }
               }
             ]}

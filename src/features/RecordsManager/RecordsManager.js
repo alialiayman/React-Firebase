@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import CoreForm from './core/CoreForm';
-import CoreList from './core/CoreList';
-import firebaseService from '../services/firebaseService';
+import CoreForm from './components/CoreForm';
+import CoreList from './components/CoreList';
+import firebaseService from '../../services/firebaseService';
 
 const svc = firebaseService();
 
@@ -30,20 +30,21 @@ const RecordsManager = ({fbUser, definition}) => {
           getRecords();
       },[]);
 
-    const columns = definition.fields.filter(x=> x.isSummary).map(r=> {return {title: r.name, field: r.name}});
-
     const handleOnAdded = (newRecord) => {
         setRecords([...records, newRecord]);
         setMode(0)
     };
     const handleOnUpdated = (updatedRecord) => {
-        const updatedCustomers = records.map(c => c.id === updatedRecord.id ? updatedRecord : c);
-        setRecords(updatedCustomers);
+        const updatedRecords = records.map(c => c.id === updatedRecord.id ? updatedRecord : c);
+        setRecords(updatedRecords);
         setMode(0)
     };
     const handleOnDeleted = (deletedRecord) => {
         const remainingRecords = records.filter(x => x.id !== deletedRecord.id);
         setRecords(remainingRecords);
+        setMode(0)
+    };
+    const handleOnCancelled = () => {
         setMode(0)
     };
     const handleOnAdd = () => {
@@ -61,8 +62,8 @@ const RecordsManager = ({fbUser, definition}) => {
     return (
         <React.Fragment>
             {
-                mode === 0 ? <CoreList name={definition.name} columns={columns} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate}></CoreList> :
-                    <CoreForm mode={mode} customer={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated}></CoreForm>
+                mode === 0 ? <CoreList definition={definition} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate}></CoreList> :
+                    <CoreForm mode={mode} definition={definition} inputRecord={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm>
             }
 
         </React.Fragment >
