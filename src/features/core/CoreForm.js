@@ -1,12 +1,18 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import customerService from '../../services/customerService';
+import firebaseService from '../../services/firebaseService';
 import { makeStyles } from '@material-ui/core/styles';
 import { Formik, ErrorMessage } from 'formik';
 import Grid from '@material-ui/core/Grid';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
+import { Paper } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -14,12 +20,22 @@ const useStyles = makeStyles((theme) => ({
         margin: '25px auto',
         border: '2px solid black'
     },
+    formTitle: {
+        margin: '10px auto',
+        width: '80%',
+        height: '50px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center',
+        fontSize: '2em',
+        backgroundColor: 'red',
+    }
 }));
 
 const CoreForm = ({ fbUser, mode, customer, onAdded, onUpdated, onDeleted }) => {
 
     const classes = useStyles();
-    const svc = customerService();
+    const svc = firebaseService();
 
     return (
         <React.Fragment>
@@ -27,15 +43,14 @@ const CoreForm = ({ fbUser, mode, customer, onAdded, onUpdated, onDeleted }) => 
                 initialValues={customer}
                 onSubmit={async (values, { setSubmitting }) => {
                     if (mode === 1) {
-                        const result = await svc.createCustomer(fbUser, values);
-                        onAdded({ id: result.data.name, ...values });
+                        const result = await svc.createRecord(fbUser, values);
+                        onAdded({ ...values, id: result.data.name });
                     } else if (mode === 2) {
-                        const result = await svc.deleteCustomer(fbUser, customer.id, values);
+                        await svc.deleteRecord(fbUser, customer.id, values);
                         onDeleted(values);
                     } else if (mode === 3) {
-                        const result = await svc.updateCustomer(fbUser, customer.id, values);
+                        await svc.updateRecord(fbUser, customer.id, values);
                         onUpdated(values);
-
                     }
                     setSubmitting(false);
                 }}
@@ -51,12 +66,25 @@ const CoreForm = ({ fbUser, mode, customer, onAdded, onUpdated, onDeleted }) => 
                     /* and other goodies */
                 }) => (
                         <form onSubmit={handleSubmit} className={classes.formContainer}>
+
+                            <Toolbar variant="dense">
+                                <IconButton edge="start" color="inherit" aria-label="menu">
+                                    <MenuIcon />
+                                </IconButton>
+                                <Typography variant="h6" color="primary">
+                                    {(mode === 1) && 'Create'}
+                                    {(mode === 2) && 'Delete'}
+                                    {(mode === 3) && 'Update'}
+                                </Typography>
+                            </Toolbar>
                             <Grid container xs={12} >
                                 <Grid item xs={6}>
                                     <TextField
                                         type="text"
                                         name="name"
                                         label='Name'
+                                        autoFocus={true}
+                                        disabled={mode === 2}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         value={values.name}
@@ -68,6 +96,7 @@ const CoreForm = ({ fbUser, mode, customer, onAdded, onUpdated, onDeleted }) => 
                                         type="text"
                                         name="address"
                                         label='Address'
+                                        disabled={mode === 2}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         value={values.address}

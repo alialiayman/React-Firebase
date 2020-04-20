@@ -54,12 +54,16 @@ const CoreList = ({ name, columns, records, onAdd, onDelete, onUpdate }) => {
               {
                 icon: tableIcons.Edit,
                 tooltip: 'Edit',
-                onClick: (event, rowData) => onUpdate(rowData)
+                onClick: (event, rowData) => {
+                  onUpdate({id: rowData.id, name: rowData.name, address: rowData.address})
+                }
               },
               {
                 icon: tableIcons.Delete,
                 tooltip: 'Delete',
-                onClick: (event, rowData) => onDelete(rowData)
+                onClick: (event, rowData) => {
+                  onDelete({id: rowData.id, name: rowData.name, address: rowData.address})
+                }
               }
             ]}
             options={{
