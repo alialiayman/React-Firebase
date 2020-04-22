@@ -73,7 +73,7 @@ const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, im
 
   return (
     <React.Fragment>
-      {(importMessage) &&
+      {(importMessage || true) &&
         <div className={classes.toolbarContainer}>
           <TextField className={classes.importUrlField} onChange={onImportUrlChange} label="Import url"></TextField>
           <div className={classes.importChip} > {importMessage} </div>
@@ -81,7 +81,7 @@ const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, im
         </div>
       }
       <MaterialTable icons={tableIcons}
-        title={`${definition.name}s`}
+        title={definition.pluralName}
         columns={sortedSummaryColumns}
         data={records}
         actions={[

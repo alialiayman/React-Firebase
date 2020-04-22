@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import CoreForm from './components/CoreForm';
 import CoreList from './components/CoreList';
+import pluralize from 'pluralize'
 import firebaseService from '../../services/firebaseService';
+import _ from 'lodash';
 
 const RecordsManager = ({ fbUser, definition }) => {
     const [importMessage, setImportMessage] = useState('');
@@ -21,7 +23,7 @@ const RecordsManager = ({ fbUser, definition }) => {
                 const result = await svc.getRecords(fbUser);
                 if (result && result.data) {
                     const objectKeys = Object.keys(result.data);
-                    const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k} });
+                    const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
                     setRecords(mappedRecords);
                     setMode(0);
                 } else {
@@ -87,7 +89,7 @@ const RecordsManager = ({ fbUser, definition }) => {
             setImportMessage(err.message);
         }
     };
-    const handleImportUrlChange = (event)=> {
+    const handleImportUrlChange = (event) => {
         setImportUrl(event.target.value);
     }
     return (
@@ -101,9 +103,49 @@ const RecordsManager = ({ fbUser, definition }) => {
     )
 }
 
-function normalizeDefinition(definition){
+function normalizeDefinition(definition) {
+    if (definition.processed) return definition;
     definition.name = definition.name[0].toUpperCase() + definition.name.toLowerCase().substring(1);
-    definition.fields = definition.fields.map(f=> {
+    definition.pluralName = pluralize(definition.name);
+    if (definition.sqlFields) {
+        if (!definition.fields) definition.fields = [];
+        const fields = definition.sqlFields.split('\n');
+        fields.forEach(sf => {
+            const fieldParts = sf.replace(/ /g,'').split('\t');
+            const name = fieldParts[0][0].toLowerCase() + fieldParts[0].substring(1);
+            const label = fieldParts[0];
+            let type = '';
+            if (fieldParts[1].includes('char')) {
+                type = 'text';
+            } else if (fieldParts[1].includes('bit')) {
+                type = 'checkbox';
+            } else if (fieldParts[1].includes('datetime')) {
+                type = 'date';
+            } else if (fieldParts[1].includes('int')) {
+                type = 'number';
+            } else if (fieldParts[1].includes('money')) {
+                type = 'number';
+            } else if (fieldParts[1].includes('decimal')) {
+                type = 'number';
+            } 
+            
+            const existingDefinitionRecord = _.find(definition.fields, (f) => f.name === fieldParts[0]);
+            if (existingDefinitionRecord) {
+                existingDefinitionRecord.label = label;
+                existingDefinitionRecord.type = type;
+                existingDefinitionRecord.name = name;
+            } else {
+                definition.fields.push({
+                    name,
+                    label,
+                    type
+                })
+            }
+
+        });
+    }
+
+    definition.fields = definition.fields.map(f => {
         const label = (f.label || (f.name[0].toUpperCase() + f.name.substring(1)));
         const type = (f.type || 'text');
         const summary = f.summary || 0;
@@ -119,12 +161,13 @@ function normalizeDefinition(definition){
         };
     });
 
-    if (!definition.fields.some(s=> s.summary)){
+    if (!definition.fields.some(s => s.summary)) {
         definition.fields[0].summary = 1;
     }
-    if (!definition.fields.some(s=> s.autofocus)){
+    if (!definition.fields.some(s => s.autofocus)) {
         definition.fields[0].autofocus = true;
     }
+    definition.processed = true;
     return definition;
 }
 

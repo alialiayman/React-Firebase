@@ -1,9 +1,8 @@
-import React  from 'react';
-import TextField from '@material-ui/core/TextField';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import firebaseService from '../../../services/firebaseService';
 import { makeStyles } from '@material-ui/core/styles';
-import { Formik, ErrorMessage } from 'formik';
+import { Formik } from 'formik';
 import Grid from '@material-ui/core/Grid';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
@@ -13,6 +12,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import CoreField from './CoreField';
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -98,22 +98,8 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                                     }
                                 />
                                 <CardContent>
-                                    <Grid container  >
-                                        {definition.fields.map(f =>
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    type={f.type}
-                                                    name={f.name}
-                                                    label={f.label}
-                                                    autoFocus={f.autoFocus}
-                                                    disabled={mode === 2 || (f.isReadOnly)}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values[f.name]}
-                                                />
-                                                <ErrorMessage name={f.name} component="div" />
-                                            </Grid>
-                                        )}
+                                    <Grid container  spacing={3}>
+                                        {definition.fields.map(f => <CoreField field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
                                     </Grid>
 
                                 </CardContent>

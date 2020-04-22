@@ -19,7 +19,7 @@ const definition = {
     { name: 'hin' },
     { name: 'owner', summary: 5 },
     { name: 'corp' },
-    { name: 'documentation' },
+    { name: 'documentation', type : 'textarea' },
     { name: 'mailing' },
     { name: 'email', type: 'email' },
     { name: 'phone', type: 'tel', summary: 6 },
@@ -27,8 +27,8 @@ const definition = {
     { name: 'lien' },
     { name: 'fileno', label: 'File No' },
     { name: 'storage' },
-    { name: 'id' },
-    { name: 'notes' },
+    { name: 'id', type: 'number' },
+    { name: 'notes', type: 'textarea' },
   ]
 }
 
