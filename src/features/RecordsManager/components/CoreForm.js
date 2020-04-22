@@ -13,7 +13,6 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
-import _ from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -45,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
 
 const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
 
-    const keyName = definition.fields.find(k => k.isKey).name;
     const classes = useStyles();
     const svc = firebaseService(definition.name.toLowerCase());
     const title = (mode) => {
@@ -60,26 +58,21 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                 break;
         }
     }
-
-    const filteredFields = _.filter(definition.fields, { 'isKey': false });
-    const sortedFields = _.orderBy(filteredFields, ['editOrder'], ['asc']);
-    const keyField = _.first(definition.fields, { 'isKey': true });
-
     return (
         <React.Fragment>
             <Formik
                 initialValues={initialInputRecord}
                 onSubmit={async (values, { setSubmitting }) => {
                     const newRecord = {};
-                    sortedFields.forEach(f => newRecord[f.name] = values[f.name]);
+                    definition.fields.forEach(f => newRecord[f.name] = values[f.name]);
                     if (mode === 1) {
                         const result = await svc.createRecord(fbUser, newRecord);
-                        onAdded({ ...values, id: result.data.name });
+                        onAdded({ ...values, firebaseId: result.data.name });
                     } else if (mode === 2) {
-                        await svc.deleteRecord(fbUser, initialInputRecord[keyName], newRecord);
+                        await svc.deleteRecord(fbUser, initialInputRecord.firebaseId, newRecord);
                         onDeleted(values);
                     } else if (mode === 3) {
-                        await svc.updateRecord(fbUser, initialInputRecord[keyName], newRecord);
+                        await svc.updateRecord(fbUser, initialInputRecord.firebaseId, newRecord);
                         onUpdated(values);
                     }
                     setSubmitting(false);
@@ -99,14 +92,14 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                             <Card raised className={classes.formContainer}>
                                 <CardHeader className={classes.cardTitle}
                                     title={title(mode)}
-                                    subheader={`${keyField.name}: ${values[keyField.name]}`}
+                                    subheader={`${values.firebaseId}`}
                                     action={
                                         <CancelOutlinedIcon color='secondary' onClick={onCancelled} />
                                     }
                                 />
                                 <CardContent>
                                     <Grid container  >
-                                        {sortedFields.map(f =>
+                                        {definition.fields.map(f =>
                                             <Grid item xs={4}>
                                                 <TextField
                                                     type={f.type}

@@ -67,9 +67,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange }) => {
-  const fieldNames = definition.fields.map(f => f.name);
-  const summaryColumns = _.filter(definition.fields, { 'isSummary': true });
-  const sortedSummaryColumns = _.orderBy(summaryColumns, ['summaryOrder', ['asc']]).map(r => { return { title: r.label, field: r.name } });
+  const summaryColumns = _.filter(definition.fields, (f)=> !!f.summary);
+  const sortedSummaryColumns = _.orderBy(summaryColumns, ['summary', ['asc']]).map(r => { return { title: r.label, field: r.name } });
   const classes = useStyles();
 
   return (
@@ -96,9 +95,7 @@ const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, im
             icon: tableIcons.Edit,
             tooltip: 'Edit ' + definition.name,
             onClick: (event, rowData) => {
-              const editRecord = {};
-              fieldNames.forEach(k => editRecord[k] = rowData[k]);
-              onUpdate(editRecord);
+              onUpdate(rowData);
             }
           },
           {
@@ -108,9 +105,7 @@ const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, im
               style: 'color: "red"',
             },
             onClick: (event, rowData) => {
-              const deleteRecord = {};
-              fieldNames.forEach(k => deleteRecord[k] = rowData[k]);
-              onDelete(deleteRecord);
+              onDelete(rowData);
             }
           }
         ]}
