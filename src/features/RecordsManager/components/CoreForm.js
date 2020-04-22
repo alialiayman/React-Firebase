@@ -1,4 +1,4 @@
-import React from 'react';
+import React  from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import firebaseService from '../../../services/firebaseService';
@@ -31,12 +31,21 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         padding: '10px',
         backgroundColor: 'silver',
+    },
+    actionsContainerTopMain: {
+        width: '50%',
+        padding: '10px',
+    },
+    actionsContainerTopButtons: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     }
 }));
 
-const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
+const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
 
-    const keyName = definition.fields.find(k=> k.isKey).name;
+    const keyName = definition.fields.find(k => k.isKey).name;
     const classes = useStyles();
     const svc = firebaseService(definition.name.toLowerCase());
     const title = (mode) => {
@@ -51,23 +60,26 @@ const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, o
                 break;
         }
     }
+
     const filteredFields = _.filter(definition.fields, { 'isKey': false });
     const sortedFields = _.orderBy(filteredFields, ['editOrder'], ['asc']);
+    const keyField = _.first(definition.fields, { 'isKey': true });
+
     return (
         <React.Fragment>
             <Formik
-                initialValues={inputRecord}
+                initialValues={initialInputRecord}
                 onSubmit={async (values, { setSubmitting }) => {
-                    const pureObject = {};
-                    sortedFields.forEach(f=> pureObject[f.name] = values[f.name]);
+                    const newRecord = {};
+                    sortedFields.forEach(f => newRecord[f.name] = values[f.name]);
                     if (mode === 1) {
-                        const result = await svc.createRecord(fbUser, pureObject);
+                        const result = await svc.createRecord(fbUser, newRecord);
                         onAdded({ ...values, id: result.data.name });
                     } else if (mode === 2) {
-                        await svc.deleteRecord(fbUser, inputRecord[keyName], pureObject);
+                        await svc.deleteRecord(fbUser, initialInputRecord[keyName], newRecord);
                         onDeleted(values);
                     } else if (mode === 3) {
-                        await svc.updateRecord(fbUser, inputRecord[keyName], pureObject);
+                        await svc.updateRecord(fbUser, initialInputRecord[keyName], newRecord);
                         onUpdated(values);
                     }
                     setSubmitting(false);
@@ -87,18 +99,21 @@ const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, o
                             <Card raised className={classes.formContainer}>
                                 <CardHeader className={classes.cardTitle}
                                     title={title(mode)}
-                                    subheader=""
+                                    subheader={`${keyField.name}: ${values[keyField.name]}`}
+                                    action={
+                                        <CancelOutlinedIcon color='secondary' onClick={onCancelled} />
+                                    }
                                 />
                                 <CardContent>
                                     <Grid container  >
-                                        {sortedFields.map(f => 
-                                            <Grid item xs={6}>
+                                        {sortedFields.map(f =>
+                                            <Grid item xs={4}>
                                                 <TextField
                                                     type={f.type}
                                                     name={f.name}
                                                     label={f.label}
                                                     autoFocus={f.autoFocus}
-                                                    disabled={mode === 2}
+                                                    disabled={mode === 2 || (f.isReadOnly)}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     value={values[f.name]}
@@ -110,6 +125,7 @@ const CoreForm = ({ fbUser, mode, definition, inputRecord, onAdded, onUpdated, o
 
                                 </CardContent>
                                 <CardActions className={classes.actionsContainer}>
+
                                     <Button type="button" disabled={isSubmitting} variant="contained" color='secondary' onClick={onCancelled} startIcon={<CancelOutlinedIcon />}>Cancel</Button>
                                     {(mode === 1) && <Button type="submit" disabled={isSubmitting} variant="contained" color='primary' startIcon={<AddOutlinedIcon />}>Create</Button>}
                                     {(mode === 2) && <Button type="submit" disabled={isSubmitting} variant="contained" color='secondary' startIcon={<DeleteOutlinedIcon />}>Delete</Button>}

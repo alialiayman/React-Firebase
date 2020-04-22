@@ -15,71 +15,116 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import { Button, TextField } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
 import _ from 'lodash';
 
 const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-    DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-    FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-    LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-    ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
-  };
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+};
 
+const useStyles = makeStyles((theme) => ({
+  toolbarContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px',
+  },
+  importButton: {
+    alignSelf: 'stretch',
+    textTransform: 'none',
+  },
+  importUrlField: {
+    width: '30%',
+  },
+  importChip: {
+    width: '30%',
+    backgroundColor: 'Teal',
+    boxShadow: '2px 2px silver',
+    padding: '10px',
+    color: 'white',
+    borderRadius: '16px',
+    fontSize: '0.8em',
+    textAlign: 'center'
+  }
+}));
 
-const CoreList = ({ definition, records, onAdd, onDelete, onUpdate }) => {
-  const fieldNames = definition.fields.map(f=> f.name);
-  const summaryColumns = _.filter(definition.fields, {'isSummary': true});
-  const sortedColumns = _.orderBy(summaryColumns, ['summaryOrder', ['asc']]).map(r=> {return {title: r.label, field: r.name}});
+const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange }) => {
+  const fieldNames = definition.fields.map(f => f.name);
+  const summaryColumns = _.filter(definition.fields, { 'isSummary': true });
+  const sortedSummaryColumns = _.orderBy(summaryColumns, ['summaryOrder', ['asc']]).map(r => { return { title: r.label, field: r.name } });
+  const classes = useStyles();
 
-    return (
-        <MaterialTable icons={tableIcons}
-            title={`${definition.name}s`}
-            columns={sortedColumns}
-            data={records}
-            actions={[
-              {
-                icon: tableIcons.Add,
-                tooltip: 'Add ' + definition.name,
-                isFreeAction: true,
-                onClick: (event) => onAdd()
-              },
-              {
-                icon: tableIcons.Edit,
-                tooltip: 'Edit ' + definition.name,
-                onClick: (event, rowData) => {
-                  const editRecord = {};
-                  fieldNames.forEach(k=> editRecord[k] = rowData[k]);
-                  onUpdate(editRecord);
-                }
-              },
-              {
-                icon: tableIcons.Delete,
-                tooltip: 'Delete ' + definition.name,
-                onClick: (event, rowData) => {
-                  const deleteRecord = {};
-                  fieldNames.forEach(k=> deleteRecord[k] = rowData[k]);
-                  onDelete(deleteRecord);
-                }
-              }
-            ]}
-            options={{
-              actionsColumnIndex: -1
-            }}
-        />
-    );
+  return (
+    <React.Fragment>
+      {(importMessage) &&
+        <div className={classes.toolbarContainer}>
+          <TextField className={classes.importUrlField} onChange={onImportUrlChange} label="Import url"></TextField>
+          <div className={classes.importChip} > {importMessage} </div>
+          <Button onClick={onImport} color='secondary' className={classes.importButton}>Import</Button>
+        </div>
+      }
+      <MaterialTable icons={tableIcons}
+        title={`${definition.name}s`}
+        columns={sortedSummaryColumns}
+        data={records}
+        actions={[
+          {
+            icon: tableIcons.Add,
+            tooltip: 'Add ' + definition.name,
+            isFreeAction: true,
+            onClick: (event) => onAdd()
+          },
+          {
+            icon: tableIcons.Edit,
+            tooltip: 'Edit ' + definition.name,
+            onClick: (event, rowData) => {
+              const editRecord = {};
+              fieldNames.forEach(k => editRecord[k] = rowData[k]);
+              onUpdate(editRecord);
+            }
+          },
+          {
+            icon: tableIcons.Delete,
+            tooltip: 'Delete ' + definition.name,
+            iconProps: {
+              style: 'color: "red"',
+            },
+            onClick: (event, rowData) => {
+              const deleteRecord = {};
+              fieldNames.forEach(k => deleteRecord[k] = rowData[k]);
+              onDelete(deleteRecord);
+            }
+          }
+        ]}
+        options={{
+          actionsColumnIndex: -1,
+        }}
+        localization={{
+          body: {
+            emptyDataSourceMessage: `No ${definition.name}s to display, import or add ${definition.name}s by clicking the plus sign above.`,
+          },
+        }}
+      />
+    </React.Fragment>
+  );
 }
 
 export default CoreList;

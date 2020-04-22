@@ -5,6 +5,8 @@ import CustomersManager from './features/Customers/CustomersManager';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import AppHeader from './features/AppHeader/AppHeader';
 import ContactsManager from './features/Contacts/ContactsManager';
+import AppHome  from './features/AppHome/AppHome';
+import YachtsManager from './features/YachtsManager/YactsManager';
 
 function App() {
   const [appState, setAppState] = useState({ User: {} });
@@ -13,14 +15,17 @@ function App() {
       setAppState(s => s = { ...appState, User: fbUser });
     }
   }
-
+  const handleOnSignedout = (fbUser) => {
+      setAppState({ User: {} });
+  }
 
   return (
     <Router>
-      <AppHeader fbUser={appState.User}></AppHeader>
-      <Route exact path="/" component={null}></Route>
+      <AppHeader fbUser={appState.User} onSignout={handleOnSignedout}></AppHeader>
+      <Route exact path="/" component={() => <AppHome fbUser={appState.User} />}></Route>
       <Route exact path="/signin" component={() => <SignIn onSignedIn={handleOnSignedIn} />}></Route>
       <Route exact path="/customers" component={() => <CustomersManager fbUser={appState.User} />}></Route>
+      <Route exact path="/yachts" component={() => <YachtsManager fbUser={appState.User} />}></Route>
       <Route exact path="/contacts" component={() => <ContactsManager fbUser={appState.User} />}></Route>
     </Router>
   );

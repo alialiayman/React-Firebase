@@ -4,8 +4,8 @@ import Button from '@material-ui/core/Button';
 import authService from '../../services/authService';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
-import {AlternateEmail, LockOutlined} from '@material-ui/icons';
-import {useHistory} from 'react-router-dom';
+import { AlternateEmail, LockOutlined } from '@material-ui/icons';
+import { useHistory } from 'react-router-dom';
 
 // TODO: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js
 // TODO: use formik https://www.youtube.com/watch?v=TxEVnaISj1w
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
         alignSelf: 'flex-start',
         marginLeft: '40px',
     }
-  }));
+}));
 
 const SignIn = ({ onSignedIn }) => {
     const [user, setUser] = useState({ email: "ayali@hotmail.com", password: "paris123" });
@@ -40,7 +40,7 @@ const SignIn = ({ onSignedIn }) => {
 
     const handleSignIn = async () => {
         const fbuser = await authService.signIn(user);
-        history.push('/customers');
+        history.push('/');
         onSignedIn(fbuser.data);
     }
 
@@ -55,7 +55,7 @@ const SignIn = ({ onSignedIn }) => {
                         <TextField value={user.email} label="Email Address" onChange={handleEmailChange} />
                     </Grid>
                 </Grid>
-                
+
                 <Grid container spacing={1} alignItems="flex-end">
                     <Grid item>
                         <LockOutlined />
