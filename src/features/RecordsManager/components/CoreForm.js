@@ -99,7 +99,7 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                                 />
                                 <CardContent>
                                     <Grid container  spacing={3}>
-                                        {definition.fields.map(f => <CoreField field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
+                                        {definition.fields.map(f => <CoreField key={f.name} field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
                                     </Grid>
 
                                 </CardContent>

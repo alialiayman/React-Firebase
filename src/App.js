@@ -7,6 +7,7 @@ import AppHeader from './features/AppHeader/AppHeader';
 import ContactsManager from './features/Contacts/ContactsManager';
 import AppHome  from './features/AppHome/AppHome';
 import YachtsManager from './features/YachtsManager/YactsManager';
+import Admin from './features/Admin/Admin'
 
 function App() {
   const [appState, setAppState] = useState({ User: {} });
@@ -19,6 +20,12 @@ function App() {
       setAppState({ User: {} });
   }
 
+  const handleOnEnableImport = ()=> {
+    const newState = {...appState};
+    newState.User.enableImport = true;
+    setAppState(newState);
+  }
+
   return (
     <Router>
       <AppHeader fbUser={appState.User} onSignout={handleOnSignedout}></AppHeader>
@@ -27,6 +34,7 @@ function App() {
       <Route exact path="/customers" component={() => <CustomersManager fbUser={appState.User} />}></Route>
       <Route exact path="/yachts" component={() => <YachtsManager fbUser={appState.User} />}></Route>
       <Route exact path="/contacts" component={() => <ContactsManager fbUser={appState.User} />}></Route>
+      <Route exact path="/admin" component={() => <Admin fbUser={appState.User} onEnableImport={handleOnEnableImport} />}></Route>
     </Router>
   );
 }

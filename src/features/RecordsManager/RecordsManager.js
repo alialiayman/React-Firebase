@@ -65,7 +65,6 @@ const RecordsManager = ({ fbUser, definition }) => {
     };
     const handleOnImport = async () => {
         try {
-            // svc.deleteTable(fbUser);
             if (!importUrl) {
                 setImportMessage('Please enter import url...');
                 return;
@@ -78,7 +77,15 @@ const RecordsManager = ({ fbUser, definition }) => {
                     const importedKeys = Object.keys(r);
                     importedKeys.forEach(ik => {
                         const normalizedKey = ik.replace('_', '').toLowerCase();
-                        newImport[normalizedKey] = r[ik]
+                        //Find this normalizedKey in the definition
+                        const matchingKey = _.find(definition.fields, (f) => f.name.toLowerCase() === normalizedKey);
+                        if (matchingKey && matchingKey.name) {
+                            if (matchingKey.type === 'date') {
+                                newImport[matchingKey.name] = (new Date(r[ik]).toISOString().substring(0,10));
+                            } else {
+                                newImport[matchingKey.name] = r[ik];
+                            }
+                        }
                     })
                     svc.createRecord(fbUser, newImport);
                     setImportMessage(`Importing ${definition.name} record# ${newImport[definition.fields[0].name]}`)
@@ -95,7 +102,7 @@ const RecordsManager = ({ fbUser, definition }) => {
     return (
         <React.Fragment>
             {
-                mode === 0 ? <CoreList definition={definition} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={importMessage} onImportUrlChange={handleImportUrlChange}></CoreList> :
+                mode === 0 ? <CoreList definition={definition} fbUser={fbUser} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={importMessage} onImportUrlChange={handleImportUrlChange}></CoreList> :
                     <CoreForm mode={mode} definition={definition} initialInputRecord={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm>
             }
 
@@ -111,7 +118,7 @@ function normalizeDefinition(definition) {
         if (!definition.fields) definition.fields = [];
         const fields = definition.sqlFields.split('\n');
         fields.forEach(sf => {
-            const fieldParts = sf.replace(/ /g,'').split('\t');
+            const fieldParts = sf.replace(/ /g, '').split('\t');
             const name = fieldParts[0][0].toLowerCase() + fieldParts[0].substring(1);
             const label = fieldParts[0];
             let type = '';
@@ -127,8 +134,8 @@ function normalizeDefinition(definition) {
                 type = 'number';
             } else if (fieldParts[1].includes('decimal')) {
                 type = 'number';
-            } 
-            
+            }
+
             const existingDefinitionRecord = _.find(definition.fields, (f) => f.name === fieldParts[0]);
             if (existingDefinitionRecord) {
                 existingDefinitionRecord.label = label;

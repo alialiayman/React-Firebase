@@ -66,14 +66,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CoreList = ({ definition, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange }) => {
+const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange }) => {
   const summaryColumns = _.filter(definition.fields, (f)=> !!f.summary);
   const sortedSummaryColumns = _.orderBy(summaryColumns, ['summary', ['asc']]).map(r => { return { title: r.label, field: r.name } });
   const classes = useStyles();
 
   return (
     <React.Fragment>
-      {(importMessage || true) &&
+      {(importMessage || fbUser.enableImport) &&
         <div className={classes.toolbarContainer}>
           <TextField className={classes.importUrlField} onChange={onImportUrlChange} label="Import url"></TextField>
           <div className={classes.importChip} > {importMessage} </div>
