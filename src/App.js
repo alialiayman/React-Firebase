@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 // import SignUp from './features/auth/SignUp';
 import SignIn from './features/auth/SignIn';
 import CustomersManager from './features/Customers/CustomersManager';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import AppHeader from './features/AppHeader/AppHeader';
 import ContactsManager from './features/Contacts/ContactsManager';
 import AppHome  from './features/AppHome/AppHome';
 import YachtsManager from './features/YachtsManager/YactsManager';
 import Admin from './features/Admin/Admin'
+import PublicRoute from './features/auth/PublicRoute';
+import PrivateRoute from './features/auth/PrivateRoute';
 
 function App() {
   const [appState, setAppState] = useState({ User: {} });
@@ -29,12 +31,12 @@ function App() {
   return (
     <Router>
       <AppHeader fbUser={appState.User} onSignout={handleOnSignedout}></AppHeader>
-      <Route exact path="/" component={() => <AppHome fbUser={appState.User} />}></Route>
-      <Route exact path="/signin" component={() => <SignIn onSignedIn={handleOnSignedIn} />}></Route>
-      <Route exact path="/customers" component={() => <CustomersManager fbUser={appState.User} />}></Route>
-      <Route exact path="/yachts" component={() => <YachtsManager fbUser={appState.User} />}></Route>
-      <Route exact path="/contacts" component={() => <ContactsManager fbUser={appState.User} />}></Route>
-      <Route exact path="/admin" component={() => <Admin fbUser={appState.User} onEnableImport={handleOnEnableImport} />}></Route>
+      <PublicRoute exact path="/" component={() => <AppHome fbUser={appState.User} />} fbUser={appState.User}></PublicRoute>
+      <PublicRoute restricted={true} exact path="/signin" component={() => <SignIn onSignedIn={handleOnSignedIn} />} fbUser={appState.User}></PublicRoute>
+      <PrivateRoute exact path="/customers" component={() => <CustomersManager fbUser={appState.User} />} fbUser={appState.User}></PrivateRoute>
+      <PrivateRoute exact path="/yachts" component={() => <YachtsManager fbUser={appState.User} />} fbUser={appState.User}></PrivateRoute>
+      <PrivateRoute exact path="/contacts" component={() => <ContactsManager fbUser={appState.User} />} fbUser={appState.User}></PrivateRoute>
+      <PrivateRoute exact path="/admin" component={() => <Admin fbUser={appState.User} onEnableImport={handleOnEnableImport} />} fbUser={appState.User}></PrivateRoute>
     </Router>
   );
 }
