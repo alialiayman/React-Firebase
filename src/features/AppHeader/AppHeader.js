@@ -7,6 +7,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Link } from 'react-router-dom';
+import PermIdentityOutlinedIcon from '@material-ui/icons/PermIdentityOutlined';
+import TuneOutlinedIcon from '@material-ui/icons/TuneOutlined';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme) => ({
     links: {
@@ -23,6 +28,33 @@ const useStyles = makeStyles((theme) => ({
 
 const AppHeader = ({ fbUser, onSignout }) => {
     const classes = useStyles();
+    const [profileAnchorEl, setAnchorEl] = React.useState(null);
+    const [settingsAnchorEl, setSettingsAnchorEl] = React.useState(null);
+
+    const handleProfileMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleProfileClick = () => {
+
+    }
+
+    const handleLogout = () => {
+        onSignout();
+    }
+
+    const handleSettingsMenuClick = (event) => {
+        setSettingsAnchorEl(event.currentTarget);
+    }
+
+    const handleSettingsMenuClose = () => {
+        setSettingsAnchorEl(null);
+    }
+
     return (
         <AppBar position="static">
             <Toolbar>
@@ -39,8 +71,44 @@ const AppHeader = ({ fbUser, onSignout }) => {
                     (!fbUser || !fbUser.idToken) && <Link to="/signin" className={classes.link}><Typography variant="button">Login</Typography></Link>
                 }
                 {
-                    (fbUser && fbUser.idToken) && <Button className={classes.link} onClick={onSignout}><Typography variant="button">Logout</Typography></Button>
+                    (fbUser && fbUser.idToken) &&
+                    (
+                        <>
+                            <IconButton edge="end" color="inherit">
+                                <HelpOutlineOutlinedIcon />
+                            </IconButton>
+
+                            <IconButton edge="end" color="inherit" onClick={handleSettingsMenuClick}>
+                                <TuneOutlinedIcon />
+                            </IconButton>
+
+                            <Menu
+                                anchorEl={settingsAnchorEl}
+                                keepMounted
+                                open={Boolean(settingsAnchorEl)}
+                                onClose={handleSettingsMenuClose}
+                            >
+                                <MenuItem>Add Table</MenuItem>
+                            </Menu>
+
+                            <IconButton edge="end" color="inherit" onClick={handleProfileMenuClick}>
+                                <PermIdentityOutlinedIcon />
+                            </IconButton>
+
+                            <Menu
+                                anchorEl={profileAnchorEl}
+                                keepMounted
+                                open={Boolean(profileAnchorEl)}
+                                onClose={handleProfileMenuClose}
+                            >
+                                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                            </Menu>
+                        </>
+                    )
+
                 }
+
 
             </Toolbar>
         </AppBar>
