@@ -4,9 +4,13 @@ import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { ErrorMessage } from 'formik';
+import CoreImage from './CoreImage';
 
 const CoreField = ({ field, mode, onChange, onBlur, value }) => {
 
+    const handleUrlChanged = (newUrl)=>{
+
+    }
 
     return (
         <React.Fragment>
@@ -90,6 +94,18 @@ const CoreField = ({ field, mode, onChange, onBlur, value }) => {
                         }
                         label={field.label}
                     />
+                    <ErrorMessage name={field.name} component="div" />
+                </Grid>)}
+
+                {((['file'].includes(field.type)) &&
+                <Grid item xs={4}>
+                    <CoreImage 
+                    name={field.name}
+                    disabled={mode === 2 || (field.isReadOnly)}
+                    initialUrl={value}
+                    onUrlChanged={handleUrlChanged}
+                    />
+                    <div>{value} {JSON.stringify(value)}</div>
                     <ErrorMessage name={field.name} component="div" />
                 </Grid>)}
         </React.Fragment>

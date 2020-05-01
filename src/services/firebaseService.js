@@ -1,7 +1,15 @@
 import axios from 'axios';
+import firebase from 'firebase/app'
+import firebaseConfig from './firebaseConfig';
+import 'firebase/storage';
 
-const firebaseProj = 'my-project-1486841534385';
+const firebaseProj = firebaseConfig.projectId;
 let tableName;
+
+
+  firebase.initializeApp(firebaseConfig);
+
+  var storage = firebase.storage();
 
 const firebaseService = (fbTable) => {
     tableName = fbTable;
@@ -33,9 +41,13 @@ const firebaseService = (fbTable) => {
         getRecords: async (user, limit) => { // TODO: implement limit on number of records returned 
             const result = await axios.get(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}.json?auth=${user.idToken}`);
             return result;
+        },
+        getImageUrl: async (fileName)=> {
+            const url = await storage.ref('images').child(fileName).getDownloadURL();
+            return url;
         }
     }
 }
 
 
-export default firebaseService;
+export {storage, firebaseService as default};

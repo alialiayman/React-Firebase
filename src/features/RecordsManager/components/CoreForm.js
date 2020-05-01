@@ -58,6 +58,10 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                 break;
         }
     }
+
+    const handleImageChange = ()=> {
+        // TODO: when image changes store it to the database using the record key and its field name
+    }
     return (
         <React.Fragment>
             <Formik

@@ -1,6 +1,7 @@
 const definition = {
   name: 'yAcht',
   fields: [
+    { name: 'photo', type: 'file' },
     { name: 'newname', label: 'New name', summary: 1 },
     { name: 'oldname', label: 'Old name', summary: 2 },
     { name: 'builder', summary: 3 },

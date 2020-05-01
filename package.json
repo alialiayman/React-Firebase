@@ -1,4 +1,5 @@
 {
+  "homepage": "http://aliayman.github.io/React-Firebase",
   "name": "react-firebase",
   "version": "0.1.0",
   "private": true,
@@ -9,6 +10,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.19.2",
+    "firebase": "^7.14.2",
     "formik": "^2.1.4",
     "gh-pages": "^2.2.0",
     "lodash": "^4.17.15",
