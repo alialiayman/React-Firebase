@@ -9,6 +9,11 @@ const Admin = ({ fbUser, onEnableImport }) => {
         svc.deleteTable(fbUser)
     }
 
+    const svcYacht = firebaseService('yacht');
+    const handleOnDeleteYachts = () => {
+        svcYacht.deleteTable(fbUser)
+    }
+
     const handleOnEnableImport = ()=> {
         onEnableImport();
     }
@@ -16,6 +21,9 @@ const Admin = ({ fbUser, onEnableImport }) => {
         <React.Fragment>
             <Button color='primary' onClick={handleOnDeleteCustomers}>
                 Delete Companies
+            </Button>
+            <Button color='primary' onClick={handleOnDeleteYachts}>
+                Delete Yachts
             </Button>
             <Button color='primary' onClick={handleOnEnableImport}>
                 Enable Import

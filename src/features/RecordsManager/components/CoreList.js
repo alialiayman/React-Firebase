@@ -15,6 +15,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import DetailsIcon from '@material-ui/icons/Details';
 import { Button, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
@@ -37,7 +38,9 @@ const tableIcons = {
   Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
   SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
   ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+  MoreDetails: forwardRef((props, ref) => <DetailsIcon {...props} ref={ref} />),
+
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -66,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange }) => {
+const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onImport, onDetails, importMessage, onImportUrlChange }) => {
   const summaryColumns = _.filter(definition.fields, (f)=> !!f.summary);
   const sortedSummaryColumns = _.orderBy(summaryColumns, ['summary', ['asc']]).map(r => { return { title: r.label, field: r.name } });
   const classes = useStyles();
@@ -92,6 +95,13 @@ const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onIm
             onClick: (event) => onAdd()
           },
           {
+            icon: tableIcons.MoreDetails,
+            tooltip: 'Details ' + definition.name,
+            onClick: (event, rowData) => {
+              onDetails(rowData);
+            }
+          },
+          {
             icon: tableIcons.Edit,
             tooltip: 'Edit ' + definition.name,
             onClick: (event, rowData) => {
@@ -111,6 +121,8 @@ const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onIm
         ]}
         options={{
           actionsColumnIndex: -1,
+          grouping: true,
+          exportButton: true,
         }}
         localization={{
           body: {

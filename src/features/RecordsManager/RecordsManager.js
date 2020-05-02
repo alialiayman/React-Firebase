@@ -5,7 +5,7 @@ import pluralize from 'pluralize'
 import firebaseService from '../../services/firebaseService';
 import _ from 'lodash';
 
-const RecordsManager = ({ fbUser, definition }) => {
+const RecordsManager = ({ fbUser, definition, initialMode }) => {
     const [importMessage, setImportMessage] = useState('');
     const [importUrl, setImportUrl] = useState('');
     const [records, setRecords] = useState([]);
@@ -15,7 +15,7 @@ const RecordsManager = ({ fbUser, definition }) => {
         initialRecords[element.name] = element.defaultValue;
     });
     const [selectedRecord, setSelectedRecord] = useState(initialRecords);
-    const [mode, setMode] = useState(0);
+    const [mode, setMode] = useState(initialMode);
     const svc = firebaseService(definition.name.toLowerCase());
     useEffect(() => {
         async function getRecords() {
@@ -63,6 +63,12 @@ const RecordsManager = ({ fbUser, definition }) => {
         setSelectedRecord(updateRecord)
         setMode(3);
     };
+    const handleOnDetails = (rowdata) => {
+        // Reload with new definition.
+        // Reload new definition from firebase, change the state and the component will reload with new data.
+        alert(JSON.stringify(rowdata));
+    }
+
     const handleOnImport = async () => {
         try {
             if (!importUrl) {
@@ -81,7 +87,7 @@ const RecordsManager = ({ fbUser, definition }) => {
                         const matchingKey = _.find(definition.fields, (f) => f.name.toLowerCase() === normalizedKey);
                         if (matchingKey && matchingKey.name) {
                             if (matchingKey.type === 'date') {
-                                newImport[matchingKey.name] = (new Date(r[ik]).toISOString().substring(0,10));
+                                newImport[matchingKey.name] = (new Date(r[ik]).toISOString().substring(0, 10));
                             } else {
                                 newImport[matchingKey.name] = r[ik];
                             }
@@ -102,8 +108,9 @@ const RecordsManager = ({ fbUser, definition }) => {
     return (
         <React.Fragment>
             {
-                mode === 0 ? <CoreList definition={definition} fbUser={fbUser} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={importMessage} onImportUrlChange={handleImportUrlChange}></CoreList> :
-                    <CoreForm mode={mode} definition={definition} initialInputRecord={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm>
+                mode ?
+                    <CoreForm mode={mode} definition={definition} initialInputRecord={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
+                    <CoreList definition={definition} fbUser={fbUser} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
             }
 
         </React.Fragment >
@@ -178,4 +185,4 @@ function normalizeDefinition(definition) {
     return definition;
 }
 
-export default RecordsManager;
+export { normalizeDefinition, RecordsManager as default };

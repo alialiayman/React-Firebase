@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SignIn = ({ onSignedIn }) => {
-    const [user, setUser] = useState({ email: "", password: "" });
+    const [user, setUser] = useState({ email: "ayali@hotmail.com", password: "paris123" });
     const classes = useStyles();
     const history = useHistory();
 

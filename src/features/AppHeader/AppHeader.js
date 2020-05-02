@@ -1,6 +1,5 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -40,7 +39,7 @@ const AppHeader = ({ fbUser, onSignout }) => {
     };
 
     const handleProfileClick = () => {
-
+        setAnchorEl(null);
     }
 
     const handleLogout = () => {
@@ -62,7 +61,6 @@ const AppHeader = ({ fbUser, onSignout }) => {
                     <MenuIcon />
                 </IconButton>
                 <div className={classes.links}>
-                    {(fbUser && fbUser.idToken) && <Link to="/admin" className={classes.link}><Typography variant="button">Admin</Typography></Link>}
                     {(fbUser && fbUser.idToken) && <Link to="/yachts" className={classes.link}><Typography variant="button">Yachts</Typography></Link>}
                     {(fbUser && fbUser.idToken) && <Link to="/customers" className={classes.link}><Typography variant="button">Companies</Typography></Link>}
                     {(fbUser && fbUser.idToken) && <Link to="/contacts" className={classes.link}><Typography variant="button">Contacts</Typography></Link>}
@@ -88,7 +86,8 @@ const AppHeader = ({ fbUser, onSignout }) => {
                                 open={Boolean(settingsAnchorEl)}
                                 onClose={handleSettingsMenuClose}
                             >
-                                <MenuItem>Add Table</MenuItem>
+                                <MenuItem><Link to="/schema">Schemas</Link></MenuItem>
+                                <MenuItem><Link to="/admin">Settings</Link></MenuItem>
                             </Menu>
 
                             <IconButton edge="end" color="inherit" onClick={handleProfileMenuClick}>
@@ -101,7 +100,7 @@ const AppHeader = ({ fbUser, onSignout }) => {
                                 open={Boolean(profileAnchorEl)}
                                 onClose={handleProfileMenuClose}
                             >
-                                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                                <MenuItem onClick={handleProfileClick}><Link to="/profile">Profile</Link></MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </>
