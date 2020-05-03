@@ -6,77 +6,73 @@ import firebaseService from '../../services/firebaseService';
 import _ from 'lodash';
 
 const RecordsManager = ({ fbUser, definition, initialMode }) => {
-    const [importMessage, setImportMessage] = useState('');
-    const [importUrl, setImportUrl] = useState('');
-    const [records, setRecords] = useState([]);
-    definition = normalizeDefinition(definition);
-    const initialRecords = {};
-    definition.fields.forEach(element => {
-        initialRecords[element.name] = element.defaultValue;
+    const [state, setState] = useState({
+        importMessage: '',
+        importUrl: '',
+        records: [],
+        selectedRecord: {},
+        mode: initialMode,
+        definition: normalizeDefinition(definition)
+    })
+
+
+    const emptyRecord = {};
+    state.definition.fields.forEach(element => {
+        emptyRecord[element.name] = element.defaultValue;
     });
-    const [selectedRecord, setSelectedRecord] = useState(initialRecords);
-    const [mode, setMode] = useState(initialMode);
-    const svc = firebaseService(definition.name.toLowerCase());
+    const svc = firebaseService(state.definition.name.toLowerCase());
     useEffect(() => {
         async function getRecords() {
-            if (records.length === 0) {
+            if (state.records.length === 0) {
                 const result = await svc.getRecords(fbUser);
                 if (result && result.data) {
                     const objectKeys = Object.keys(result.data);
                     const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
-                    setRecords(mappedRecords);
-                    setMode(0);
-                } else {
-                    setImportMessage('Enter service Url, then press Import to import up to 5000 records');
+                    setState({ ...state, mode: 0, records: mappedRecords });
                 }
             }
         }
         getRecords();
-    }, [fbUser, svc, definition, records]);
+    }, [fbUser, svc, state, emptyRecord]);
 
     const handleOnAdded = (newRecord) => {
-        setRecords([...records, newRecord]);
-        setMode(0)
+        setState({ ...state, mode: 0, records: [...state.records, newRecord] });
     };
     const handleOnUpdated = (updatedRecord) => {
-        const updatedRecords = records.map(c => c.firebaseId === updatedRecord.firebaseId ? updatedRecord : c);
-        setRecords(updatedRecords);
-        setMode(0)
+        const updatedRecords = state.records.map(c => c.firebaseId === updatedRecord.firebaseId ? updatedRecord : c);
+        setState({ ...state, mode: 0, records: updatedRecords });
     };
     const handleOnDeleted = (deletedRecord) => {
-        const remainingRecords = records.filter(x => x.firebaseId !== deletedRecord.firebaseId);
-        setRecords(remainingRecords);
-        setMode(0)
+        const remainingRecords = state.records.filter(x => x.firebaseId !== deletedRecord.firebaseId);
+        setState({ ...state, mode: 0, records: remainingRecords });
     };
     const handleOnCancelled = () => {
-        setMode(0)
+        setState({ ...state, mode: 0 });
     };
     const handleOnAdd = () => {
-        setSelectedRecord(initialRecords);
-        setMode(1);
+        setState({ ...state, mode: 1, selectedRecord: emptyRecord });
     };
     const handleOnDelete = (deleteRecord) => {
-        setSelectedRecord(deleteRecord)
-        setMode(2);
+        setState({ ...state, mode: 2, selectedRecord: deleteRecord });
     };
     const handleOnUpdate = (updateRecord) => {
-        setSelectedRecord(updateRecord)
-        setMode(3);
+        setState({ ...state, mode: 3, selectedRecord: updateRecord });
     };
     const handleOnDetails = (rowdata) => {
-        // Reload with new definition.
-        // Reload new definition from firebase, change the state and the component will reload with new data.
-        alert(JSON.stringify(rowdata));
+        const newTable = `${definition.name}-${definition.childmodel}-${rowdata.firebaseId}`
+        const childDefinition = {};
+        childDefinition.name = newTable;
+        childDefinition.fields = [...definition.childfields];
+        setState({ ...state, definition: normalizeDefinition(childDefinition), records: [], selectedRecord: {}, });
     }
 
     const handleOnImport = async () => {
         try {
-            if (!importUrl) {
-                setImportMessage('Please enter import url...');
-                return;
+            if (!state.importUrl) {
+                return setState({ ...state, importMessage: 'Please enter import url...' });
             }
-            const importRecords = await (await svc.importFrom(importUrl)).data;
-            setImportMessage(`Found ${importRecords.length} ${definition.name} records. Importing...`);
+            const importRecords = await (await svc.importFrom(state.importUrl)).data;
+            setState({ ...state, importMessage: `Found ${importRecords.length} ${definition.name} records. Importing...` });
             importRecords.forEach(r => {
                 setTimeout(() => {
                     const newImport = {};
@@ -94,23 +90,22 @@ const RecordsManager = ({ fbUser, definition, initialMode }) => {
                         }
                     })
                     svc.createRecord(fbUser, newImport);
-                    setImportMessage(`Importing ${definition.name} record# ${newImport[definition.fields[0].name]}`)
-                    setRecords([...records, newImport]);
+                    setState({ ...state, importMessage: `Importing ${definition.name} record# ${newImport[definition.fields[0].name]}`, records: [...state.records, newImport] });
                 }, 2000)
             });
         } catch (err) {
-            setImportMessage(err.message);
+            setState({ ...state, importMessage: err.message });
         }
     };
     const handleImportUrlChange = (event) => {
-        setImportUrl(event.target.value);
+        setState({ ...state, importUrl: event.target.value });
     }
     return (
         <React.Fragment>
             {
-                mode ?
-                    <CoreForm mode={mode} definition={definition} initialInputRecord={selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
-                    <CoreList definition={definition} fbUser={fbUser} records={records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
+                state.mode ?
+                    <CoreForm mode={state.mode} definition={state.definition} initialInputRecord={state.selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
+                    <CoreList definition={state.definition} fbUser={fbUser} records={state.records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={state.importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
             }
 
         </React.Fragment >
@@ -159,6 +154,7 @@ function normalizeDefinition(definition) {
         });
     }
 
+    // reassure all fields have type, label, summary, default value and readonly flag
     definition.fields = definition.fields.map(f => {
         const label = (f.label || (f.name[0].toUpperCase() + f.name.substring(1)));
         const type = (f.type || 'text');
@@ -175,12 +171,15 @@ function normalizeDefinition(definition) {
         };
     });
 
+    // reassure least one summary column
     if (!definition.fields.some(s => s.summary)) {
         definition.fields[0].summary = 1;
     }
+    // reassure least one autofocus column
     if (!definition.fields.some(s => s.autofocus)) {
         definition.fields[0].autofocus = true;
     }
+
     definition.processed = true;
     return definition;
 }
