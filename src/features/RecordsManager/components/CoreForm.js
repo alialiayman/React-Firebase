@@ -42,18 +42,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
+const CoreForm = ({ fbUser, mode, model, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
 
     const classes = useStyles();
-    const svc = firebaseService(definition.name.toLowerCase());
+    const svc = firebaseService(model.name.toLowerCase());
     const title = (mode) => {
         switch (mode) {
             case 1:
-                return 'Create ' + definition.name;
+                return 'Create ' + model.name;
             case 2:
-                return 'Delete ' + definition.name;
+                return 'Delete ' + model.name;
             case 3:
-                return 'Update ' + definition.name;
+                return 'Update ' + model.name;
             default:
                 break;
         }
@@ -68,12 +68,16 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                 initialValues={initialInputRecord}
                 onSubmit={async (values, { setSubmitting }) => {
                     const newRecord = {};
-                    definition.fields.forEach(f => newRecord[f.name] = values[f.name]);
+                    model.fields.forEach(f => newRecord[f.name] = values[f.name]);
                     if (mode === 1) {
                         const result = await svc.createRecord(fbUser, newRecord);
                         onAdded({ ...values, firebaseId: result.data.name });
                     } else if (mode === 2) {
                         await svc.deleteRecord(fbUser, initialInputRecord.firebaseId, newRecord);
+                        if (model.childfields){
+                            const svcChildren = firebaseService(`${model.name}-${model.childmodel}${initialInputRecord.firebaseId}`.toLowerCase());
+                            await svcChildren.deleteTable(fbUser);
+                        }
                         onDeleted(values);
                     } else if (mode === 3) {
                         await svc.updateRecord(fbUser, initialInputRecord.firebaseId, newRecord);
@@ -103,7 +107,7 @@ const CoreForm = ({ fbUser, mode, definition, initialInputRecord, onAdded, onUpd
                                 />
                                 <CardContent>
                                     <Grid container  spacing={3}>
-                                        {definition.fields.map(f => <CoreField key={f.name} field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
+                                        {model.fields.map(f => <CoreField key={f.name} field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
                                     </Grid>
 
                                 </CardContent>

@@ -11,7 +11,6 @@ const definition = {
     {name: 'label', label: 'Label', summary: 3},
     {name: 'defaultValue', label: 'Default Value', summary: 4},
     {name: 'summary', label: 'List Order', summary: 5},
-    {name: 'readOnly', type: 'checkbox', summary: 6},
   ]
 }
 

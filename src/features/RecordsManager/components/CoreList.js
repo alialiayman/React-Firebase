@@ -69,8 +69,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onImport, onDetails, importMessage, onImportUrlChange }) => {
-  const summaryColumns = _.filter(definition.fields, (f)=> !!f.summary);
+const CoreList = ({ model, fbUser, records, onAdd, onDelete, onUpdate, onImport, onDetails, importMessage, onImportUrlChange }) => {
+  const summaryColumns = _.filter(model.fields, (f)=> !!f.summary);
   const sortedSummaryColumns = _.orderBy(summaryColumns, ['summary', ['asc']]).map(r => { return { title: r.label, field: r.name } });
   const classes = useStyles();
 
@@ -84,33 +84,33 @@ const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onIm
         </div>
       }
       <MaterialTable icons={tableIcons}
-        title={definition.pluralName}
+        title={model.pluralName}
         columns={sortedSummaryColumns}
         data={records}
         actions={[
           {
             icon: tableIcons.Add,
-            tooltip: 'Add ' + definition.name,
+            tooltip: 'Add ' + model.name,
             isFreeAction: true,
             onClick: (event) => onAdd()
           },
           {
             icon: tableIcons.MoreDetails,
-            tooltip: 'Details ' + definition.name,
+            tooltip: 'Details ' + model.name,
             onClick: (event, rowData) => {
               onDetails(rowData);
             }
           },
           {
             icon: tableIcons.Edit,
-            tooltip: 'Edit ' + definition.name,
+            tooltip: 'Edit ' + model.name,
             onClick: (event, rowData) => {
               onUpdate(rowData);
             }
           },
           {
             icon: tableIcons.Delete,
-            tooltip: 'Delete ' + definition.name,
+            tooltip: 'Delete ' + model.name,
             iconProps: {
               style: 'color: "red"',
             },
@@ -126,7 +126,7 @@ const CoreList = ({ definition, fbUser, records, onAdd, onDelete, onUpdate, onIm
         }}
         localization={{
           body: {
-            emptyDataSourceMessage: `No ${definition.name}s to display, import or add ${definition.name}s by clicking the plus sign above.`,
+            emptyDataSourceMessage: `No ${model.name}s to display, import or add ${model.name}s by clicking the plus sign above.`,
           },
         }}
       />

@@ -86,8 +86,8 @@ const AppHeader = ({ fbUser, onSignout }) => {
                                 open={Boolean(settingsAnchorEl)}
                                 onClose={handleSettingsMenuClose}
                             >
-                                <MenuItem><Link to="/schema">Schemas</Link></MenuItem>
-                                <MenuItem><Link to="/admin">Settings</Link></MenuItem>
+                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/schema">Schemas</Link></MenuItem>
+                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/admin">Settings</Link></MenuItem>
                             </Menu>
 
                             <IconButton edge="end" color="inherit" onClick={handleProfileMenuClick}>

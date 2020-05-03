@@ -20,7 +20,7 @@ const Profile = withRouter(({fbUser})=> {
     }
     const newDefinitions = normalizeDefinition(definition);
     return (
-        <CoreForm mode={3} definition={newDefinitions} initialInputRecord={selectedRecord} fbUser={fbUser} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm>
+        <CoreForm mode={3} model={newDefinitions} initialInputRecord={selectedRecord} fbUser={fbUser} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm>
     )
 });
 

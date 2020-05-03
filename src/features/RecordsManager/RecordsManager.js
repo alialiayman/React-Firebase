@@ -59,7 +59,7 @@ const RecordsManager = ({ fbUser, definition, initialMode }) => {
         setState({ ...state, mode: 3, selectedRecord: updateRecord });
     };
     const handleOnDetails = (rowdata) => {
-        const newTable = `${definition.name}-${definition.childmodel}-${rowdata.firebaseId}`
+        const newTable = `${definition.name}-${definition.childmodel}${rowdata.firebaseId}`
         const childDefinition = {};
         childDefinition.name = newTable;
         childDefinition.fields = [...definition.childfields];
@@ -104,21 +104,21 @@ const RecordsManager = ({ fbUser, definition, initialMode }) => {
         <React.Fragment>
             {
                 state.mode ?
-                    <CoreForm mode={state.mode} definition={state.definition} initialInputRecord={state.selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
-                    <CoreList definition={state.definition} fbUser={fbUser} records={state.records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={state.importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
+                    <CoreForm mode={state.mode} model={state.definition} initialInputRecord={state.selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
+                    <CoreList model={state.definition} fbUser={fbUser} records={state.records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={state.importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
             }
 
         </React.Fragment >
     )
 }
 
-function normalizeDefinition(definition) {
-    if (definition.processed) return definition;
-    definition.name = definition.name[0].toUpperCase() + definition.name.toLowerCase().substring(1);
-    definition.pluralName = pluralize(definition.name);
-    if (definition.sqlFields) {
-        if (!definition.fields) definition.fields = [];
-        const fields = definition.sqlFields.split('\n');
+function normalizeDefinition(model) {
+    if (model.processed) return model;
+    model.name = model.name[0].toUpperCase() + model.name.toLowerCase().substring(1);
+    model.pluralName = pluralize(model.name);
+    if (model.sqlFields) {
+        if (!model.fields) model.fields = [];
+        const fields = model.sqlFields.split('\n');
         fields.forEach(sf => {
             const fieldParts = sf.replace(/ /g, '').split('\t');
             const name = fieldParts[0][0].toLowerCase() + fieldParts[0].substring(1);
@@ -138,13 +138,13 @@ function normalizeDefinition(definition) {
                 type = 'number';
             }
 
-            const existingDefinitionRecord = _.find(definition.fields, (f) => f.name === fieldParts[0]);
+            const existingDefinitionRecord = _.find(model.fields, (f) => f.name === fieldParts[0]);
             if (existingDefinitionRecord) {
                 existingDefinitionRecord.label = label;
                 existingDefinitionRecord.type = type;
                 existingDefinitionRecord.name = name;
             } else {
-                definition.fields.push({
+                model.fields.push({
                     name,
                     label,
                     type
@@ -155,7 +155,7 @@ function normalizeDefinition(definition) {
     }
 
     // reassure all fields have type, label, summary, default value and readonly flag
-    definition.fields = definition.fields.map(f => {
+    model.fields = model.fields.map(f => {
         const label = (f.label || (f.name[0].toUpperCase() + f.name.substring(1)));
         const type = (f.type || 'text');
         const summary = f.summary || 0;
@@ -172,16 +172,16 @@ function normalizeDefinition(definition) {
     });
 
     // reassure least one summary column
-    if (!definition.fields.some(s => s.summary)) {
-        definition.fields[0].summary = 1;
+    if (!model.fields.some(s => s.summary)) {
+        model.fields[0].summary = 1;
     }
     // reassure least one autofocus column
-    if (!definition.fields.some(s => s.autofocus)) {
-        definition.fields[0].autofocus = true;
+    if (!model.fields.some(s => s.autoFocus)) {
+        model.fields[0].autoFocus = true;
     }
 
-    definition.processed = true;
-    return definition;
+    model.processed = true;
+    return model;
 }
 
 export { normalizeDefinition, RecordsManager as default };
