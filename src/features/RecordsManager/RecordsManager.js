@@ -4,8 +4,9 @@ import CoreList from './components/CoreList';
 import pluralize from 'pluralize'
 import firebaseService from '../../services/firebaseService';
 import _ from 'lodash';
+import { useSelector } from 'react-redux';
 
-const RecordsManager = ({ fbUser, definition, initialMode }) => {
+const RecordsManager = ({ definition, initialMode }) => {
     const [state, setState] = useState({
         importMessage: '',
         importUrl: '',
@@ -13,7 +14,8 @@ const RecordsManager = ({ fbUser, definition, initialMode }) => {
         selectedRecord: {},
         mode: initialMode,
         definition: normalizeDefinition(definition)
-    })
+    });
+    const fbUser = useSelector((state)=> state.user);
 
 
     const emptyRecord = {};
@@ -23,7 +25,7 @@ const RecordsManager = ({ fbUser, definition, initialMode }) => {
     const svc = firebaseService(state.definition.name.toLowerCase());
     useEffect(() => {
         async function getRecords() {
-            if (state.records.length === 0) {
+            if (state.records.length === 0 && fbUser) {
                 const result = await svc.getRecords(fbUser);
                 if (result && result.data) {
                     const objectKeys = Object.keys(result.data);

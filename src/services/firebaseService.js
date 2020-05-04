@@ -7,9 +7,9 @@ const firebaseProj = firebaseConfig.projectId;
 let tableName;
 
 
-  firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-  var storage = firebase.storage();
+var storage = firebase.storage();
 
 const firebaseService = (fbTable) => {
     tableName = fbTable;
@@ -42,7 +42,7 @@ const firebaseService = (fbTable) => {
             const result = await axios.get(`https://${firebaseProj}.firebaseio.com/${user.localId}/${tableName}.json?auth=${user.idToken}`);
             return result;
         },
-        getImageUrl: async (fileName)=> {
+        getImageUrl: async (fileName) => {
             const url = await storage.ref('images').child(fileName).getDownloadURL();
             return url;
         }
@@ -50,4 +50,4 @@ const firebaseService = (fbTable) => {
 }
 
 
-export {storage, firebaseService as default};
+export { storage, firebaseService as default };

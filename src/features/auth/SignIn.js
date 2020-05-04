@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AlternateEmail, LockOutlined } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 import { CardContent, CardActions } from '@material-ui/core';
+import { useDispatch } from 'react-redux';
 
 // TODO: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js
 // TODO: use formik https://www.youtube.com/watch?v=TxEVnaISj1w
@@ -27,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const SignIn = ({ onSignedIn }) => {
+const SignIn = () => {
+    const dispatch = useDispatch();
     const [user, setUser] = useState({ email: "ayali@hotmail.com", password: "paris123" });
     const classes = useStyles();
     const history = useHistory();
@@ -41,9 +43,11 @@ const SignIn = ({ onSignedIn }) => {
     }
 
     const handleSignIn = async () => {
-        const fbuser = await authService.signIn(user);
-        history.push('/');
-        onSignedIn(fbuser.data);
+        const loginUser = await authService.signIn(user);
+        if (loginUser) {
+            dispatch({ type: 'SET_USER', user: loginUser.data });
+            history.push('/');
+        }
     }
 
     return (

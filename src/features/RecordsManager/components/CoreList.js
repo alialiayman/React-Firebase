@@ -76,7 +76,7 @@ const CoreList = ({ model, fbUser, records, onAdd, onDelete, onUpdate, onImport,
 
   return (
     <React.Fragment>
-      {(importMessage || fbUser.enableImport) &&
+      {(importMessage) &&
         <div className={classes.toolbarContainer}>
           <TextField className={classes.importUrlField} onChange={onImportUrlChange} label="Import url"></TextField>
           <div className={classes.importChip} > {importMessage} </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -11,6 +11,8 @@ import TuneOutlinedIcon from '@material-ui/icons/TuneOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { useSelector, useDispatch } from 'react-redux';
+import firebaseService from '../../services/firebaseService';
 
 const useStyles = makeStyles((theme) => ({
     links: {
@@ -25,7 +27,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AppHeader = ({ fbUser, onSignout }) => {
+const AppHeader = () => {
+    const fbUser = useSelector((state) => state.user);
+    const schemas = useSelector((state) => state.schemas);
+    const dispatch = useDispatch();
+
+    const isLoggedIn = fbUser && fbUser.idToken;
+    const svc = firebaseService('schema');
+    useEffect(() => {
+        async function getSchemas() {
+            if (isLoggedIn && Object.keys(schemas).length === 0) {
+                const baseSchemas = await svc.getRecords(fbUser);
+                dispatch({ type: 'SET_SCHEMAS', schemas: baseSchemas.data });
+            }
+        }
+        getSchemas();
+    }, [dispatch, fbUser, isLoggedIn, svc, schemas]);
     const classes = useStyles();
     const [profileAnchorEl, setAnchorEl] = React.useState(null);
     const [settingsAnchorEl, setSettingsAnchorEl] = React.useState(null);
@@ -43,7 +60,8 @@ const AppHeader = ({ fbUser, onSignout }) => {
     }
 
     const handleLogout = () => {
-        onSignout();
+        // dispatch({ type: 'SET_USER', user: {} });
+        // history.push('/');
     }
 
     const handleSettingsMenuClick = (event) => {
@@ -61,15 +79,15 @@ const AppHeader = ({ fbUser, onSignout }) => {
                     <MenuIcon />
                 </IconButton>
                 <div className={classes.links}>
-                    {(fbUser && fbUser.idToken) && <Link to="/yachts" className={classes.link}><Typography variant="button">Yachts</Typography></Link>}
-                    {(fbUser && fbUser.idToken) && <Link to="/customers" className={classes.link}><Typography variant="button">Companies</Typography></Link>}
-                    {(fbUser && fbUser.idToken) && <Link to="/contacts" className={classes.link}><Typography variant="button">Contacts</Typography></Link>}
+                    {isLoggedIn && Object.keys(schemas).length > 0 && Object.keys(schemas).map(k => {
+                        return (<Link to={`/${schemas[k].name.toLowerCase()}`} className={classes.link}><Typography variant="button">{schemas[k].name}</Typography></Link>)
+                    })}
                 </div>
                 {
-                    (!fbUser || !fbUser.idToken) && <Link to="/signin" className={classes.link}><Typography variant="button">Login</Typography></Link>
+                    (!isLoggedIn) && <Link to="/signin" className={classes.link}><Typography variant="button">Login</Typography></Link>
                 }
                 {
-                    (fbUser && fbUser.idToken) &&
+                    (isLoggedIn) &&
                     (
                         <>
                             <IconButton edge="end" color="inherit">
