@@ -6,7 +6,7 @@ import firebaseService from '../../services/firebaseService';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-const RecordsManager = ({ definition, initialMode }) => {
+const RecordsManager = ({ definition, initialMode, match }) => {
     const [state, setState] = useState({
         importMessage: '',
         importUrl: '',
@@ -15,17 +15,19 @@ const RecordsManager = ({ definition, initialMode }) => {
         mode: initialMode,
         definition: normalizeDefinition(definition)
     });
-    const fbUser = useSelector((state)=> state.user);
-
-
+    const fbUser = useSelector((state) => state.user);
+    const schemas = useSelector((state) => state.schemas);
+    let svc;
     const emptyRecord = {};
-    state.definition.fields.forEach(element => {
-        emptyRecord[element.name] = element.defaultValue;
-    });
-    const svc = firebaseService(state.definition.name.toLowerCase());
+    if (state.definition && state.definition.fields) {
+        state.definition.fields.forEach(element => {
+            emptyRecord[element.name] = element.defaultValue;
+        });
+        svc = firebaseService(state.definition.name.toLowerCase());
+    }
     useEffect(() => {
         async function getRecords() {
-            if (state.records.length === 0 && fbUser) {
+            if (state.records.length === 0 && fbUser && state.definition && state.definition.fields) {
                 const result = await svc.getRecords(fbUser);
                 if (result && result.data) {
                     const objectKeys = Object.keys(result.data);
@@ -36,6 +38,20 @@ const RecordsManager = ({ definition, initialMode }) => {
         }
         getRecords();
     }, [fbUser, svc, state, emptyRecord]);
+
+    if (!state.definition && match.params.bookName) {
+        // Make a definition from bookName and state
+        // const schemaKeys = Object.keys(schemas);
+        const newModel = {
+            name: match.params.bookName,
+            fields: [
+                { name: 'name' },
+                { name: 'newName' }
+            ],
+        }
+        setState({ ...state, definition: normalizeDefinition(newModel) });
+        return;
+    }
 
     const handleOnAdded = (newRecord) => {
         setState({ ...state, mode: 0, records: [...state.records, newRecord] });
@@ -115,6 +131,7 @@ const RecordsManager = ({ definition, initialMode }) => {
 }
 
 function normalizeDefinition(model) {
+    if (!model) return null;
     if (model.processed) return model;
     model.name = model.name[0].toUpperCase() + model.name.toLowerCase().substring(1);
     model.pluralName = pluralize(model.name);

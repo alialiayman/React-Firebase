@@ -121,7 +121,7 @@ const CoreList = ({ model, fbUser, records, onAdd, onDelete, onUpdate, onImport,
         ]}
         options={{
           actionsColumnIndex: -1,
-          grouping: true,
+          grouping: false,
           exportButton: true,
         }}
         localization={{

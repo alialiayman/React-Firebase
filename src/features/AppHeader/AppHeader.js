@@ -38,7 +38,9 @@ const AppHeader = () => {
         async function getSchemas() {
             if (isLoggedIn && Object.keys(schemas).length === 0) {
                 const baseSchemas = await svc.getRecords(fbUser);
-                dispatch({ type: 'SET_SCHEMAS', schemas: baseSchemas.data });
+                if (baseSchemas.data) {
+                    dispatch({ type: 'SET_SCHEMAS', schemas: baseSchemas.data });
+                }
             }
         }
         getSchemas();
@@ -80,8 +82,10 @@ const AppHeader = () => {
                 </IconButton>
                 <div className={classes.links}>
                     {isLoggedIn && Object.keys(schemas).length > 0 && Object.keys(schemas).map(k => {
-                        return (<Link to={`/${schemas[k].name.toLowerCase()}`} className={classes.link}><Typography variant="button">{schemas[k].name}</Typography></Link>)
+                        return (<Link to={`/book/${schemas[k].name.toLowerCase()}`} className={classes.link}><Typography variant="button">{schemas[k].name}</Typography></Link>)
                     })}
+
+                    {isLoggedIn && Object.keys(schemas).length === 0 && <div>Click settings to add some books</div>}
                 </div>
                 {
                     (!isLoggedIn) && <Link to="/signin" className={classes.link}><Typography variant="button">Login</Typography></Link>
@@ -104,7 +108,7 @@ const AppHeader = () => {
                                 open={Boolean(settingsAnchorEl)}
                                 onClose={handleSettingsMenuClose}
                             >
-                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/schema">Schemas</Link></MenuItem>
+                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/schema">Books</Link></MenuItem>
                                 <MenuItem onClick={handleSettingsMenuClose}><Link to="/admin">Settings</Link></MenuItem>
                             </Menu>
 
