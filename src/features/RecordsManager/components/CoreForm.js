@@ -12,6 +12,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import { useSelector } from 'react-redux';
 import CoreField from './CoreField';
 
 const useStyles = makeStyles((theme) => ({
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const CoreForm = ({ fbUser, mode, model, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
+const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
 
     const classes = useStyles();
     const svc = firebaseService(model.name.toLowerCase());
@@ -58,6 +59,7 @@ const CoreForm = ({ fbUser, mode, model, initialInputRecord, onAdded, onUpdated,
                 break;
         }
     }
+    const fbUser = useSelector((state) => state.user);
 
     // const handleImageChange = ()=> {
     //     // TODO: when image changes store it to the database using the record key and its field name
@@ -100,7 +102,7 @@ const CoreForm = ({ fbUser, mode, model, initialInputRecord, onAdded, onUpdated,
                             <Card raised className={classes.formContainer}>
                                 <CardHeader className={classes.cardTitle}
                                     title={title(mode)}
-                                    subheader={`${values.firebaseId}`}
+                                    subheader={`${values.firebaseId}` || ''}
                                     action={
                                         <CancelOutlinedIcon color='secondary' onClick={onCancelled} />
                                     }

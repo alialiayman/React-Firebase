@@ -8,8 +8,8 @@ import Admin from './features/Admin/Admin'
 import Profile from './features/Profile/Profile'
 import PublicRoute from './features/auth/PublicRoute';
 import PrivateRoute from './features/auth/PrivateRoute';
-import SchemaManager from './features/SchemaManager/SchemaManager';
-import RecordsManager from './features/RecordsManager/RecordsManager';
+import TableManager from './features/TableManager/TableManager';
+import DataManager from './features/DataManager/DataManager';
 
 function App() {
 
@@ -20,8 +20,8 @@ function App() {
       <PublicRoute restricted={true} exact path="/signin" component={SignIn}></PublicRoute>
       <PrivateRoute exact path="/admin" component={Admin}></PrivateRoute>
       <PrivateRoute exact path="/profile" component={Profile}></PrivateRoute>
-      <PrivateRoute exact path="/schema" component={SchemaManager}></PrivateRoute>
-      <PrivateRoute exact path="/book/:bookName" component={RecordsManager}></PrivateRoute>
+      <PrivateRoute exact path="/table" component={TableManager}></PrivateRoute>
+      <PrivateRoute exact path="/table/:tablename" component={DataManager}></PrivateRoute>
     </Router>
   );
 }

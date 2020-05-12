@@ -6,63 +6,50 @@ import firebaseService from '../../services/firebaseService';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-const RecordsManager = ({ definition, initialMode, match }) => {
+
+const RecordsManager = ({ model, initialMode, onModelChange , onRecordAdded, onRecordDeleted, onRecordUpated}) => {
     const [state, setState] = useState({
         importMessage: '',
         importUrl: '',
         records: [],
         selectedRecord: {},
         mode: initialMode,
-        definition: normalizeDefinition(definition)
     });
+    model = touchModel(model);
     const fbUser = useSelector((state) => state.user);
-    const schemas = useSelector((state) => state.schemas);
-    let svc;
-    const emptyRecord = {};
-    if (state.definition && state.definition.fields) {
-        state.definition.fields.forEach(element => {
-            emptyRecord[element.name] = element.defaultValue;
-        });
-        svc = firebaseService(state.definition.name.toLowerCase());
-    }
+    const svc = firebaseService(model.name.toLowerCase());
+    const emptyRecord = establishEmptyRecord(model);
+
     useEffect(() => {
         async function getRecords() {
-            if (state.records.length === 0 && fbUser && state.definition && state.definition.fields) {
+            if (canLoadRecords(state, model, fbUser)) {
                 const result = await svc.getRecords(fbUser);
                 if (result && result.data) {
                     const objectKeys = Object.keys(result.data);
                     const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
-                    setState({ ...state, mode: 0, records: mappedRecords });
+                    setState({ ...state, records: mappedRecords });
                 }
             }
         }
         getRecords();
-    }, [fbUser, svc, state, emptyRecord]);
+    }, [fbUser, svc, state, model, emptyRecord]);
 
-    if (!state.definition && match.params.bookName) {
-        // Make a definition from bookName and state
-        // const schemaKeys = Object.keys(schemas);
-        const newModel = {
-            name: match.params.bookName,
-            fields: [
-                { name: 'name' },
-                { name: 'newName' }
-            ],
-        }
-        setState({ ...state, definition: normalizeDefinition(newModel) });
-        return;
+    if (!model){
+        return null;
     }
-
     const handleOnAdded = (newRecord) => {
         setState({ ...state, mode: 0, records: [...state.records, newRecord] });
+        onRecordAdded(newRecord);
     };
     const handleOnUpdated = (updatedRecord) => {
         const updatedRecords = state.records.map(c => c.firebaseId === updatedRecord.firebaseId ? updatedRecord : c);
         setState({ ...state, mode: 0, records: updatedRecords });
+        onRecordUpated(updatedRecord);
     };
     const handleOnDeleted = (deletedRecord) => {
         const remainingRecords = state.records.filter(x => x.firebaseId !== deletedRecord.firebaseId);
         setState({ ...state, mode: 0, records: remainingRecords });
+        onRecordDeleted(deletedRecord);
     };
     const handleOnCancelled = () => {
         setState({ ...state, mode: 0 });
@@ -77,11 +64,8 @@ const RecordsManager = ({ definition, initialMode, match }) => {
         setState({ ...state, mode: 3, selectedRecord: updateRecord });
     };
     const handleOnDetails = (rowdata) => {
-        const newTable = `${definition.name}-${definition.childmodel}${rowdata.firebaseId}`
-        const childDefinition = {};
-        childDefinition.name = newTable;
-        childDefinition.fields = [...definition.childfields];
-        setState({ ...state, definition: normalizeDefinition(childDefinition), records: [], selectedRecord: {}, });
+        setState({...state, records:[]})
+        onModelChange(rowdata.firebaseId);
     }
 
     const handleOnImport = async () => {
@@ -90,7 +74,7 @@ const RecordsManager = ({ definition, initialMode, match }) => {
                 return setState({ ...state, importMessage: 'Please enter import url...' });
             }
             const importRecords = await (await svc.importFrom(state.importUrl)).data;
-            setState({ ...state, importMessage: `Found ${importRecords.length} ${definition.name} records. Importing...` });
+            setState({ ...state, importMessage: `Found ${importRecords.length} ${model.name} records. Importing...` });
             importRecords.forEach(r => {
                 setTimeout(() => {
                     const newImport = {};
@@ -98,7 +82,7 @@ const RecordsManager = ({ definition, initialMode, match }) => {
                     importedKeys.forEach(ik => {
                         const normalizedKey = ik.replace('_', '').toLowerCase();
                         //Find this normalizedKey in the definition
-                        const matchingKey = _.find(definition.fields, (f) => f.name.toLowerCase() === normalizedKey);
+                        const matchingKey = _.find(model.fields, (f) => f.name.toLowerCase() === normalizedKey);
                         if (matchingKey && matchingKey.name) {
                             if (matchingKey.type === 'date') {
                                 newImport[matchingKey.name] = (new Date(r[ik]).toISOString().substring(0, 10));
@@ -108,7 +92,7 @@ const RecordsManager = ({ definition, initialMode, match }) => {
                         }
                     })
                     svc.createRecord(fbUser, newImport);
-                    setState({ ...state, importMessage: `Importing ${definition.name} record# ${newImport[definition.fields[0].name]}`, records: [...state.records, newImport] });
+                    setState({ ...state, importMessage: `Importing ${model.name} record# ${newImport[model.fields[0].name]}`, records: [...state.records, newImport] });
                 }, 2000)
             });
         } catch (err) {
@@ -122,16 +106,43 @@ const RecordsManager = ({ definition, initialMode, match }) => {
         <React.Fragment>
             {
                 state.mode ?
-                    <CoreForm mode={state.mode} model={state.definition} initialInputRecord={state.selectedRecord} fbUser={fbUser} onAdded={handleOnAdded} onDeleted={handleOnDeleted} onUpdated={handleOnUpdated} onCancelled={handleOnCancelled}></CoreForm> :
-                    <CoreList model={state.definition} fbUser={fbUser} records={state.records} onAdd={handleOnAdd} onDelete={handleOnDelete} onUpdate={handleOnUpdate} onImport={handleOnImport} importMessage={state.importMessage} onImportUrlChange={handleImportUrlChange} onDetails={handleOnDetails}></CoreList>
+                    <CoreForm 
+                    mode={state.mode} 
+                    model={model} 
+                    initialInputRecord={state.selectedRecord} 
+                    onAdded={handleOnAdded} 
+                    onDeleted={handleOnDeleted} 
+                    onUpdated={handleOnUpdated} 
+                    onCancelled={handleOnCancelled}
+                    /> :
+                    <CoreList 
+                    model={model}  
+                    records={state.records} 
+                    onAdd={handleOnAdd} 
+                    onDelete={handleOnDelete} 
+                    onUpdate={handleOnUpdate} 
+                    onImport={handleOnImport} 
+                    importMessage={state.importMessage} 
+                    onImportUrlChange={handleImportUrlChange} 
+                    onModelChange={handleOnDetails}
+                    />
             }
-
         </React.Fragment >
     )
 }
 
-function normalizeDefinition(model) {
-    if (!model) return null;
+function establishEmptyRecord(model) {
+    const output = {};
+    if (model && model.fields) {
+        model.fields.forEach(element => {
+            output[element.name] = element.defaultValue;
+        });
+    }
+    return output;
+}
+
+function touchModel(model) {
+    if (!model || !model.name || !model.fields) return null;
     if (model.processed) return model;
     model.name = model.name[0].toUpperCase() + model.name.toLowerCase().substring(1);
     model.pluralName = pluralize(model.name);
@@ -203,4 +214,8 @@ function normalizeDefinition(model) {
     return model;
 }
 
-export { normalizeDefinition, RecordsManager as default };
+function canLoadRecords(state, model, fbUser){
+    return (state.records.length ===0  &&  (!state.mode || state.mode === 0) && fbUser && model && model.fields)
+}
+
+export { touchModel, RecordsManager as default };

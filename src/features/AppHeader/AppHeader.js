@@ -29,22 +29,25 @@ const useStyles = makeStyles((theme) => ({
 
 const AppHeader = () => {
     const fbUser = useSelector((state) => state.user);
-    const schemas = useSelector((state) => state.schemas);
+    const tables = useSelector((state) => state.tables);
     const dispatch = useDispatch();
 
     const isLoggedIn = fbUser && fbUser.idToken;
-    const svc = firebaseService('schema');
+    const svc = firebaseService('table');
     useEffect(() => {
-        async function getSchemas() {
-            if (isLoggedIn && Object.keys(schemas).length === 0) {
-                const baseSchemas = await svc.getRecords(fbUser);
-                if (baseSchemas.data) {
-                    dispatch({ type: 'SET_SCHEMAS', schemas: baseSchemas.data });
+        async function getTables() {
+            if (isLoggedIn && Object.keys(tables).length === 0) {
+                const result = await svc.getRecords(fbUser);
+                if (result.data) {
+                    const objectKeys = Object.keys(result.data);
+                    // TODO: //Loop and fetch all field records TableName-firebaseId-columns
+                    const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
+                    dispatch({ type: 'SET_TABLES', tables: mappedRecords });
                 }
             }
         }
-        getSchemas();
-    }, [dispatch, fbUser, isLoggedIn, svc, schemas]);
+        getTables();
+    }, [dispatch, fbUser, isLoggedIn, svc, tables]);
     const classes = useStyles();
     const [profileAnchorEl, setAnchorEl] = React.useState(null);
     const [settingsAnchorEl, setSettingsAnchorEl] = React.useState(null);
@@ -81,11 +84,11 @@ const AppHeader = () => {
                     <MenuIcon />
                 </IconButton>
                 <div className={classes.links}>
-                    {isLoggedIn && Object.keys(schemas).length > 0 && Object.keys(schemas).map(k => {
-                        return (<Link to={`/book/${schemas[k].name.toLowerCase()}`} className={classes.link}><Typography variant="button">{schemas[k].name}</Typography></Link>)
+                    {isLoggedIn && <Link to={`/`} className={classes.link}><Typography variant="button">Home</Typography></Link>}
+                    {isLoggedIn && Object.keys(tables).length > 0 && Object.keys(tables).map(k => {
+                        return (<Link to={`/table/${tables[k].name.toLowerCase()}`} className={classes.link}><Typography variant="button">{tables[k].name}</Typography></Link>)
                     })}
 
-                    {isLoggedIn && Object.keys(schemas).length === 0 && <div>Click settings to add some books</div>}
                 </div>
                 {
                     (!isLoggedIn) && <Link to="/signin" className={classes.link}><Typography variant="button">Login</Typography></Link>
@@ -108,7 +111,7 @@ const AppHeader = () => {
                                 open={Boolean(settingsAnchorEl)}
                                 onClose={handleSettingsMenuClose}
                             >
-                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/schema">Books</Link></MenuItem>
+                                <MenuItem onClick={handleSettingsMenuClose}><Link to="/table">Tables</Link></MenuItem>
                                 <MenuItem onClick={handleSettingsMenuClose}><Link to="/admin">Settings</Link></MenuItem>
                             </Menu>
 
@@ -129,8 +132,6 @@ const AppHeader = () => {
                     )
 
                 }
-
-
             </Toolbar>
         </AppBar>
     )

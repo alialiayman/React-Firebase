@@ -1,11 +1,6 @@
-const definition = {
-  name: 'schema',
-  childmodel: 'fields',
+const model = {
+  name: 'column',
   fields: [
-    { name: 'name', label: 'Dossier Name' },
-    {name: 'enabled', label: 'Active', type: 'checkbox', defaultValue: true}
-  ],
-  childfields: [
     { name: 'name', label: 'Name',  summary: 1},
     {name: 'type', label: 'Type', summary: 2},
     {name: 'label', label: 'Label', summary: 3},
@@ -15,4 +10,4 @@ const definition = {
 }
 
 
-export default definition;
+export default model;

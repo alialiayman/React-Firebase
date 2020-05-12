@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CoreList = ({ model, fbUser, records, onAdd, onDelete, onUpdate, onImport, onDetails, importMessage, onImportUrlChange }) => {
+const CoreList = ({ model, records, onAdd, onDelete, onUpdate, onImport, importMessage, onImportUrlChange, onModelChange }) => {
   const summaryColumns = _.filter(model.fields, (f)=> !!f.summary);
   const sortedSummaryColumns = _.orderBy(summaryColumns, ['summary', ['asc']]).map(r => { return { title: r.label, field: r.name } });
   const classes = useStyles();
@@ -98,7 +98,7 @@ const CoreList = ({ model, fbUser, records, onAdd, onDelete, onUpdate, onImport,
             icon: tableIcons.MoreDetails,
             tooltip: 'Details ' + model.name,
             onClick: (event, rowData) => {
-              onDetails(rowData);
+              onModelChange(rowData);
             }
           },
           {

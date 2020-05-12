@@ -26,6 +26,7 @@ const CoreField = ({ field, mode, onChange, onBlur, value }) => {
                         onChange={onChange}
                         onBlur={onBlur}
                         value={value}
+                        autoComplete="off"
                     />
                     <ErrorMessage name={field.name} component="div" />
                 </Grid>)}
