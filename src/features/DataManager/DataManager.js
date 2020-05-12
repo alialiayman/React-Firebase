@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import RecordsManager from '../RecordsManager/RecordsManager';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 
 const DataManager = ({ match }) => {
-
-    const [state, setState] = useState({
-        model: {}
-    });
     const tableName = match.params.tableName;
 
     const dispatch = useDispatch();
     const tables = useSelector(s => s.tables);
-    const model = _.find(tables, (t) => t.name === tableName);
+    const model = _.find(tables, (t) => t.name.toLowerCase() === tableName.toLowerCase());
     const handleModelChange = (firebaseId) => {
-        if (state.model.child) {
+        if (model.child) {
             // columnModel.name = `${state.model.name}${firebaseId}-${state.model.child}`
             // setState({ model: columnModel });
         }
