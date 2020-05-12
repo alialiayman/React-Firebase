@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import RecordsManager from '../RecordsManager/RecordsManager';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 
 const DataManager = ({ match }) => {
 
@@ -10,6 +11,8 @@ const DataManager = ({ match }) => {
     const tableName = match.params.tableName;
 
     const dispatch = useDispatch();
+    const tables = useSelector(s => s.tables);
+    const model = _.find(tables, (t) => t.name === tableName);
     const handleModelChange = (firebaseId) => {
         if (state.model.child) {
             // columnModel.name = `${state.model.name}${firebaseId}-${state.model.child}`
@@ -28,9 +31,9 @@ const DataManager = ({ match }) => {
     }
 
     return (
-        state.model.name ?
+        model.name ?
             <RecordsManager
-                model={state.model}
+                model={model}
                 onModelChange={handleModelChange}
                 onRecordDeleted={handleDeletedRecord}
                 onRecordAdded={handleAddRecord}

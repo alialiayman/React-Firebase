@@ -21,7 +21,7 @@ function App() {
       <PrivateRoute exact path="/admin" component={Admin}></PrivateRoute>
       <PrivateRoute exact path="/profile" component={Profile}></PrivateRoute>
       <PrivateRoute exact path="/table" component={TableManager}></PrivateRoute>
-      <PrivateRoute exact path="/table/:tablename" component={DataManager}></PrivateRoute>
+      <PrivateRoute exact path="/table/:tableName" component={DataManager}></PrivateRoute>
     </Router>
   );
 }

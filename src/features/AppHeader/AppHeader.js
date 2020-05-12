@@ -42,6 +42,16 @@ const AppHeader = () => {
                     const objectKeys = Object.keys(result.data);
                     // TODO: //Loop and fetch all field records TableName-firebaseId-columns
                     const mappedRecords = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
+                    for (let i = 0; i < mappedRecords.length; i++) {
+                        const columnSvc = firebaseService(`table${mappedRecords[i].firebaseId}-column`.toLowerCase());
+                        const result = await columnSvc.getRecords(fbUser);
+                        if (result.data) {
+                            const objectKeys = Object.keys(result.data);
+                            const columns = objectKeys.map(k => { return { ...result.data[k], firebaseId: k } });
+                            mappedRecords[i].fields = columns;
+                        }
+                    }
+
                     dispatch({ type: 'SET_TABLES', tables: mappedRecords });
                 }
             }
