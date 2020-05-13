@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import firebaseService from '../../../services/firebaseService';
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,6 +14,7 @@ import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import { useSelector } from 'react-redux';
 import CoreField from './CoreField';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     },
     actionsContainer: {
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
         padding: '10px',
         backgroundColor: 'silver',
@@ -45,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
 
 const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDeleted, onCancelled }) => {
 
+    const [state, SetState] = useState({
+        importDMLOpen: false,
+        importJSONOpen: false,
+    });
     const classes = useStyles();
     const svc = firebaseService(model.name.toLowerCase());
     const title = (mode) => {
@@ -76,7 +81,7 @@ const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDelet
                         onAdded({ ...values, firebaseId: result.data.name });
                     } else if (mode === 2) {
                         await svc.deleteRecord(fbUser, initialInputRecord.firebaseId, newRecord);
-                        if (model.childfields){
+                        if (model.childfields) {
                             const svcChildren = firebaseService(`${model.name}-${model.childmodel}${initialInputRecord.firebaseId}`.toLowerCase());
                             await svcChildren.deleteTable(fbUser);
                         }
@@ -108,23 +113,41 @@ const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDelet
                                     }
                                 />
                                 <CardContent>
-                                    <Grid container  spacing={3}>
-                                        {model.fields.map(f => <CoreField key={f.name} field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur}/>)}
+                                    <Grid container spacing={3}>
+                                        {model.fields.map(f => <CoreField key={f.name} field={f} value={values[f.name]} mode={mode} onChange={handleChange} onBlur={handleBlur} />)}
                                     </Grid>
 
                                 </CardContent>
                                 <CardActions className={classes.actionsContainer}>
-
-                                    <Button type="button" disabled={isSubmitting} variant="contained" color='secondary' onClick={onCancelled} startIcon={<CancelOutlinedIcon />}>Cancel</Button>
-                                    {(mode === 1) && <Button type="submit" disabled={isSubmitting} variant="contained" color='primary' startIcon={<AddOutlinedIcon />}>Create</Button>}
-                                    {(mode === 2) && <Button type="submit" disabled={isSubmitting} variant="contained" color='secondary' startIcon={<DeleteOutlinedIcon />}>Delete</Button>}
-                                    {(mode === 3) && <Button type="submit" disabled={isSubmitting} variant="contained" color='primary' startIcon={<SaveOutlinedIcon />}>Save</Button>}
+                                    <div>
+                                        <Button type="button" disabled={isSubmitting} color='secondary' onClick={() => SetState({ ...state, importJSONOpen: true })} >Import JSON</Button>
+                                        <Button type="button" disabled={isSubmitting} color='secondary' onClick={() => SetState({ ...state, importDMLOpen: true })} >Import DML</Button>
+                                    </div>
+                                    <div>
+                                        <Button type="button" disabled={isSubmitting} variant="contained" color='secondary' onClick={onCancelled} startIcon={<CancelOutlinedIcon />}>Cancel</Button>
+                                        {(mode === 1) && <Button type="submit" disabled={isSubmitting} variant="contained" color='primary' startIcon={<AddOutlinedIcon />}>Create</Button>}
+                                        {(mode === 2) && <Button type="submit" disabled={isSubmitting} variant="contained" color='secondary' startIcon={<DeleteOutlinedIcon />}>Delete</Button>}
+                                        {(mode === 3) && <Button type="submit" disabled={isSubmitting} variant="contained" color='primary' startIcon={<SaveOutlinedIcon />}>Save</Button>}
+                                    </div>
                                 </CardActions>
                             </Card>
                         </form>
                     )}
 
             </Formik>
+            <Dialog open={state.importDMLOpen} onClose={() => SetState({ ...state, importDMLOpen: false })}>
+                <DialogTitle>
+                    Modal title
+                </DialogTitle>
+                <DialogContent dividers>
+dadasda
+                </DialogContent>
+                <DialogActions>
+                    <Button autoFocus color="primary">
+                        Do the import
+          </Button>
+                </DialogActions>
+            </Dialog>
         </React.Fragment>
     )
 }
