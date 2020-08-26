@@ -1,22 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.5ecd60fb.chunk.css",
-    "main.js": "/static/js/main.b92b4023.chunk.js",
-    "main.js.map": "/static/js/main.b92b4023.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.9360a294.js",
-    "runtime-main.js.map": "/static/js/runtime-main.9360a294.js.map",
-    "static/js/2.4810d6a8.chunk.js": "/static/js/2.4810d6a8.chunk.js",
-    "static/js/2.4810d6a8.chunk.js.map": "/static/js/2.4810d6a8.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.1936d918a2e4f44f9faad1fb3c55ffcf.js": "/precache-manifest.1936d918a2e4f44f9faad1fb3c55ffcf.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.5ecd60fb.chunk.css.map": "/static/css/main.5ecd60fb.chunk.css.map",
-    "static/js/2.4810d6a8.chunk.js.LICENSE.txt": "/static/js/2.4810d6a8.chunk.js.LICENSE.txt"
+    "main.js": "/React-Firebase/static/js/main.9cb9b904.chunk.js",
+    "main.js.map": "/React-Firebase/static/js/main.9cb9b904.chunk.js.map",
+    "runtime-main.js": "/React-Firebase/static/js/runtime-main.b15228b5.js",
+    "runtime-main.js.map": "/React-Firebase/static/js/runtime-main.b15228b5.js.map",
+    "static/js/2.98f0f6c0.chunk.js": "/React-Firebase/static/js/2.98f0f6c0.chunk.js",
+    "static/js/2.98f0f6c0.chunk.js.map": "/React-Firebase/static/js/2.98f0f6c0.chunk.js.map",
+    "index.html": "/React-Firebase/index.html",
+    "precache-manifest.aebde48022829ae5f06f70929106a9dc.js": "/React-Firebase/precache-manifest.aebde48022829ae5f06f70929106a9dc.js",
+    "service-worker.js": "/React-Firebase/service-worker.js",
+    "static/js/2.98f0f6c0.chunk.js.LICENSE.txt": "/React-Firebase/static/js/2.98f0f6c0.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.9360a294.js",
-    "static/js/2.4810d6a8.chunk.js",
-    "static/css/main.5ecd60fb.chunk.css",
-    "static/js/main.b92b4023.chunk.js"
+    "static/js/runtime-main.b15228b5.js",
+    "static/js/2.98f0f6c0.chunk.js",
+    "static/js/main.9cb9b904.chunk.js"
   ]
 }
