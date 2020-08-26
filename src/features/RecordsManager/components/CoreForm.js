@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import firebaseService from '../../../services/firebaseService';
-import { makeStyles } from '@material-ui/core/styles';
-import { Formik } from 'formik';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
 import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import { Formik } from 'formik';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import firebaseService from '../../../services/firebaseService';
 import CoreField from './CoreField';
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -69,6 +69,28 @@ const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDelet
     // const handleImageChange = ()=> {
     //     // TODO: when image changes store it to the database using the record key and its field name
     // }
+
+    let importText = '';
+    const handleImportChange = (event) => {
+        importText = event.target.value;
+    }
+
+    const handleImport = async () => {
+        const rows = importText.split('\n');
+        for (let i = 0; i < rows.length; i++) {
+            let regex = /(\w*?)\s(\w*)/g;
+            let [, name, type] = regex.exec(rows[i]) || [];
+            if (name) {
+                let newRecord = {initialInputRecord};
+                newRecord.name = name.substring(0, 1).toLowerCase() + name.substring(1);
+                newRecord.label = name;
+                newRecord.type = convertToFirebaseType(type);
+                svc.createRecord(fbUser, newRecord);
+            }
+        }
+        SetState({ ...state, importDMLOpen: false });
+        // onAdded({ ...newRecord});
+    }
     return (
         <React.Fragment>
             <Formik
@@ -135,21 +157,32 @@ const CoreForm = ({ mode, model, initialInputRecord, onAdded, onUpdated, onDelet
                     )}
 
             </Formik>
-            <Dialog open={state.importDMLOpen} onClose={() => SetState({ ...state, importDMLOpen: false })}>
+            <Dialog open={state.importDMLOpen} onClose={() => SetState({ ...state, importDMLOpen: false })} style={{ width: '90%' }}>
                 <DialogTitle>
-                    Modal title
+                    Import columns
                 </DialogTitle>
                 <DialogContent dividers>
-dadasda
+                    <TextField label="Names" autoFocus fullWidth multiline required rows="10" variant='outlined' onChange={handleImportChange}>
+
+                    </TextField>
                 </DialogContent>
                 <DialogActions>
-                    <Button autoFocus color="primary">
-                        Do the import
-          </Button>
+                    <Button color="primary" onClick={handleImport}>
+                        Import
+                    </Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
     )
+}
+
+function convertToFirebaseType(typ) {
+    const _typ = typ.toLowerCase();
+    if (_typ.includes('int')) return 'number';
+    if (_typ.includes('bit')) return 'checkbox';
+
+    return 'text'
+
 }
 
 export default CoreForm;
