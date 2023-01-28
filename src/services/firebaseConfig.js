@@ -1,11 +1,12 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyDxggzPT57iqEo-tohF6HqdpYj4YmIopnM",
-  authDomain: "my-project-1486841534385.firebaseapp.com",
-  databaseURL: "https://my-project-1486841534385.firebaseio.com",
-  projectId: "my-project-1486841534385",
-  storageBucket: "my-project-1486841534385.appspot.com",
-  messagingSenderId: "1064996410450",
-  appId: "1:1064996410450:web:bdb4a48fd567e062257b8b",
+  apiKey: "AIzaSyBkP0qXVsCzcXWBw2CpaWM7fElX-yjL-yY",
+  authDomain: "fire-hawk.firebaseapp.com",
+  databaseURL: "https://fire-hawk-default-rtdb.firebaseio.com",
+  projectId: "fire-hawk",
+  storageBucket: "fire-hawk.appspot.com",
+  messagingSenderId: "331956533424",
+  appId: "1:331956533424:web:378341d6da5bd19873a375",
+  measurementId: "G-1XFQ0726RF"
 };
 
 export default firebaseConfig;
