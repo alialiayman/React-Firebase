@@ -18,8 +18,6 @@ npm start
 
 <img width="1238" alt="image" src="https://user-images.githubusercontent.com/117768999/215238608-1cccb7a7-495b-46b6-8b4f-c4e1cdc7c9fb.png">
 
-
-
 ## References
 
 ### Routing
